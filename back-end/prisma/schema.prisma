@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model click {
+  id       Int     @id @default(autoincrement())
+  url_code String? @db.VarChar(255)
+  ip       String? @db.VarChar(255)
+
+  @@unique([url_code, ip], map: "url_code_ip")
+}
+
+model funnels_db {
+  id         Int       @id @default(autoincrement())
+  apply      String?   @db.VarChar(30)
+  region     String?   @db.VarChar(10)
+  name       String?   @db.VarChar(20)
+  phone      String?   @db.VarChar(20)
+  revenue    String?   @db.VarChar(20)
+  memo       String?   @db.Text
+  privacy    String?   @default("0") @db.VarChar(5)
+  created_at DateTime? @default(now()) @db.Timestamp(0)
+  service    String?   @db.VarChar(30)
+}
+
+model url_code_setting {
+  id                  Int       @id @default(autoincrement())
+  hospital_name       String    @db.VarChar(255)
+  user_id             Int
+  url_code            String    @unique(map: "url_code_unique") @db.VarChar(255)
+  db_request_count    Int?      @default(0)
+  db_click_count      Int?      @default(0)
+  created_at          DateTime? @default(now()) @db.Timestamp(0)
+  updated_at          DateTime? @default(now()) @db.Timestamp(0)
+  ad_title            String    @db.VarChar(255)
+  ad_number           String    @db.VarChar(50)
+  advertising_company String    @db.VarChar(25)
+}
