@@ -60,13 +60,24 @@ async function incrementClickCount(urlCode) {
 
 // 새로운 클릭 기록 추가
 async function createClickRecord(urlCode, ip) {
-  return await prisma.click.create({
-    data: {
-      url_code: urlCode,
-      ip: ip,
-    },
-  });
+  try {
+    return await prisma.click.create({
+      data: {
+        url_code: urlCode,
+        ip: ip,
+      },
+    });
+  } catch (error) {
+    if (error.code === "P2002") {
+      // 중복된 레코드에 대한 처리 (예: 업데이트하거나, 오류 메시지 반환)
+      console.log("This record already exists.");
+      return null;
+    } else {
+      throw error;
+    }
+  }
 }
+
 module.exports = {
   checkCodeUniqueness,
   createUrlCode,

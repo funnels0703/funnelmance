@@ -40,7 +40,7 @@ const createUrlCodeController = async (req, res) => {
 // URL 코드에 해당하는 데이터 가져오기 및 클릭 카운트 증가
 async function getUrlCodeData(req, res) {
   const { urlCode } = req.params;
-  const clientIp = req.headers["x-forwarded-for"] || req.ip;
+  // const clientIp = req.headers["x-forwarded-for"] || req.ip;
 
   try {
     // URL 코드가 유효한지 확인
@@ -55,10 +55,10 @@ async function getUrlCodeData(req, res) {
 
     // if (!existingClick) {
     // 클릭 카운트 증가
-    await incrementClickCount(urlCode);
+    // await incrementClickCount(urlCode);
 
     // 클릭 기록 추가
-    await createClickRecord(urlCode, clientIp);
+    // await createClickRecord(urlCode, clientIp);
     // }
 
     res.json(codeData);
@@ -68,8 +68,27 @@ async function getUrlCodeData(req, res) {
   }
 }
 
+async function postUrlCodeData(req, res) {
+  const { urlCode } = req.params;
+  const clientIp = req.headers["x-forwarded-for"] || req.ip;
+  try {
+    // 클릭 카운트 증가
+    await incrementClickCount(urlCode);
+
+    // 클릭 기록 추가
+    await createClickRecord(urlCode, clientIp);
+
+    res.status(200).json({
+      message: "Click count incremented and record created successfully",
+    });
+  } catch (error) {
+    console.error("Error processing click:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}
 module.exports = {
   createUrlCodeController,
   // 접속처리
   getUrlCodeData,
+  postUrlCodeData,
 };

@@ -17,31 +17,33 @@ function CodePage() {
       try {
         const hasClicked = localStorage.getItem(`clicked_${urlCode}`);
 
-        if (!hasClicked) {
-          const response = await axios.get(`/api/urlcode/${urlCode}`);
-          const fetchedData = response.data;
+        // URL 코드로 데이터 가져오기
+        const response = await axios.get(`/api/urlcode/${urlCode}`);
+        const fetchedData = response.data;
 
-          // code와 urlCode 모두 확인
-          if (
-            fetchedData.ad_number !== code ||
-            fetchedData.url_code !== urlCode
-          ) {
-            setError("잘못된 경로입니다.");
-          } else {
-            setCodeData(fetchedData);
-            localStorage.setItem(`clicked_${urlCode}`, "true");
-          }
+        // code와 urlCode 모두 확인
+        if (
+          fetchedData.ad_number !== code ||
+          fetchedData.url_code !== urlCode
+        ) {
+          setError("잘못된 경로입니다.");
         } else {
-          const response = await axios.get(`/api/urlcode/${urlCode}`);
-          const fetchedData = response.data;
+          setCodeData(fetchedData);
 
-          if (
-            fetchedData.ad_number !== code ||
-            fetchedData.url_code !== urlCode
-          ) {
-            setError("잘못된 경로입니다.");
-          } else {
-            setCodeData(fetchedData);
+          // 로컬 스토리지에 클릭 기록 저장 및 1초 후 클릭 데이터 전송
+          if (!hasClicked) {
+            localStorage.setItem(`clicked_${urlCode}`, "true");
+
+            setTimeout(async () => {
+              try {
+                const postResponse = await axios.post(
+                  `/api/urlcode/${urlCode}`
+                );
+                console.log("Click data sent successfully:", postResponse.data);
+              } catch (error) {
+                console.error("Error sending click data:", error);
+              }
+            }, 5000);
           }
         }
       } catch (err) {
