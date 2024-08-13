@@ -51,15 +51,15 @@ async function getUrlCodeData(req, res) {
     }
 
     // IP 주소로 기존 클릭 기록 확인
-    const existingClick = await findClickByIpAndCode(urlCode, clientIp);
+    // const existingClick = await findClickByIpAndCode(urlCode, clientIp);
 
-    if (!existingClick) {
-      // 클릭 카운트 증가
-      await incrementClickCount(urlCode);
+    // if (!existingClick) {
+    // 클릭 카운트 증가
+    await incrementClickCount(urlCode);
 
-      // 클릭 기록 추가
-      await createClickRecord(urlCode, clientIp);
-    }
+    // 클릭 기록 추가
+    await createClickRecord(urlCode, clientIp);
+    // }
 
     res.json(codeData);
   } catch (error) {

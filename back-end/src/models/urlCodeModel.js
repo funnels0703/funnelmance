@@ -24,20 +24,25 @@ async function findCodeByUrlCode(urlCode) {
     where: {
       url_code: urlCode,
     },
-  });
-}
-
-// IP로 기존 클릭 기록 확인
-async function findClickByIpAndCode(urlCode, ip) {
-  return await prisma.click.findUnique({
-    where: {
-      url_code_ip: {
-        url_code: urlCode,
-        ip: ip,
-      },
+    select: {
+      url_code: true, // 필요한 경우, 이 필드도 포함
+      ad_number: true, // ad_number 필드를 가져옴
+      // 필요하다면 다른 필드도 추가할 수 있습니다
     },
   });
 }
+
+// // IP로 기존 클릭 기록 확인
+// async function findClickByIpAndCode(urlCode, ip) {
+//   return await prisma.click.findUnique({
+//     where: {
+//       url_code_ip: {
+//         url_code: urlCode,
+//         ip: ip,
+//       },
+//     },
+//   });
+// }
 
 // 클릭 카운트 증가
 async function incrementClickCount(urlCode) {
@@ -67,7 +72,7 @@ module.exports = {
   createUrlCode,
   // 접속 처리
   findCodeByUrlCode,
-  findClickByIpAndCode,
+  // findClickByIpAndCode,
   incrementClickCount,
   createClickRecord,
 };

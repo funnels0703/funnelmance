@@ -11,7 +11,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/code-generator" element={<CodeGenerator />} />
-          <Route path="/001/:urlCode" element={<CodePage />} />{" "}
+          <Route path="/:code/:urlCode" element={<CodePage />} />
           {/* URL 코드에 따른 페이지 */}
           <Route path="*" element={<NotFound />} />
         </Routes>
