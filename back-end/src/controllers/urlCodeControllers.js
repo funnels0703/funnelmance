@@ -40,7 +40,7 @@ const createUrlCodeController = async (req, res) => {
 // URL 코드에 해당하는 데이터 가져오기 및 클릭 카운트 증가
 async function getUrlCodeData(req, res) {
   const { urlCode } = req.params;
-  const clientIp = req.ip; // 클라이언트 IP 주소
+  const clientIp = req.headers["x-forwarded-for"] || req.ip;
 
   try {
     // URL 코드가 유효한지 확인
