@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import AdLandingPage from "../Randing/AdLandingPage";
 
 function CodePage() {
   const { code, urlCode } = useParams();
@@ -78,82 +79,9 @@ function CodePage() {
 
   return (
     <div className="container">
-      <h2>랜딩 페이지</h2>
-      <p>아래 정보를 입력해 주세요.</p>
-      <div className="input-group">
-        <label>이름:</label>
-        <input
-          type="text"
-          name="name"
-          value={formData.name}
-          onChange={handleInputChange}
-          required
-        />
-      </div>
-      <div className="input-group">
-        <label>이메일:</label>
-        <input
-          type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleInputChange}
-          required
-        />
-      </div>
-      <div className="input-group">
-        <label>전화번호:</label>
-        <input
-          type="tel"
-          name="phone"
-          value={formData.phone}
-          onChange={handleInputChange}
-          required
-        />
-      </div>
-      <button className="submit-button" onClick={handleSubmit}>
-        제출하기
-      </button>
-
-      <style jsx>{`
-        .container {
-          padding: 20px;
-          max-width: 600px;
-          margin: 0 auto;
-        }
-
-        h2 {
-          margin-bottom: 10px;
-        }
-
-        .input-group {
-          margin-bottom: 10px;
-        }
-
-        label {
-          display: block;
-          margin-bottom: 5px;
-        }
-
-        input {
-          padding: 8px;
-          width: 100%;
-          box-sizing: border-box;
-        }
-
-        .submit-button {
-          padding: 10px 20px;
-          background-color: #007bff;
-          color: white;
-          border: none;
-          cursor: pointer;
-          margin-top: 20px;
-          width: 100%;
-        }
-
-        .submit-button:hover {
-          background-color: #0056b3;
-        }
-      `}</style>
+      {code === "001" && <AdLandingPage urlCode={urlCode} />}{" "}
+      {/* {code === "002" && <AdLandingPage urlCode={urlCode} />}{" "} */}
+      {code !== "001" && <p>해당 코드로는 특별한 이벤트가 없습니다.</p>}
     </div>
   );
 }

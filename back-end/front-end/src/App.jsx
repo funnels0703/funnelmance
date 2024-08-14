@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import NotFound from "./components/NotFound.jsx";
 import CodeGenerator from "./pages/code/CodeGenerator.jsx";
 import CodePage from "./pages/code/CodePage.jsx";
+import CustomorDataPage from "./pages/customorDataPage/CustomorDataPage.jsx";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
           <Route path="/code-generator" element={<CodeGenerator />} />
           <Route path="/:code/:urlCode" element={<CodePage />} />
           {/* URL 코드에 따른 페이지 */}
+          <Route path="/db" element={<CustomorDataPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
