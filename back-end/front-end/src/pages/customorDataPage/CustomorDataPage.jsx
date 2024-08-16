@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 function CustomorDataPage() {
-  const [customors, setCustomors] = useState([]); // 모든 데이터를 저장하는 배열
+  const [customors, setCustomors] = useState([]);
+  const [editState, setEditState] = useState({});
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -11,15 +12,20 @@ function CustomorDataPage() {
       try {
         const response = await axios.get(`/api/customor`);
         if (response.data.length > 0) {
-          setCustomors(response.data); // 데이터를 배열로 저장
+          setCustomors(response.data);
+          const initialState = {};
+          response.data.forEach((item) => {
+            initialState[item.id] = false; // 각 아이템 ID에 대해 수정 상태를 false로 초기화
+          });
+          setEditState(initialState);
         } else {
           setError("데이터가 없습니다.");
         }
-        setLoading(false); // 로딩 상태 해제
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
         setError("데이터를 불러오는 중 오류가 발생했습니다.");
-        setLoading(false); // 오류 발생 시에도 로딩 상태 해제
+        setLoading(false);
       }
     };
 
@@ -35,6 +41,10 @@ function CustomorDataPage() {
     );
   };
 
+  const handleEdit = (id) => {
+    setEditState((prev) => ({ ...prev, [id]: true }));
+  };
+
   const handleSubmit = async (index) => {
     const customor = customors[index];
     try {
@@ -43,6 +53,7 @@ function CustomorDataPage() {
         customor
       );
       console.log("Data updated successfully:", response.data);
+      setEditState((prev) => ({ ...prev, [customor.id]: false }));
     } catch (error) {
       console.error("Error submitting data:", error);
     }
@@ -59,126 +70,112 @@ function CustomorDataPage() {
   return (
     <div className="container">
       <h2>고객 데이터</h2>
-      <div className="card-container">
-        {customors.map((customor, index) => (
-          <div key={customor.id} className="card">
-            <div className="input-group">
-              <label>이름:</label>
-              <input
-                type="text"
-                name="name"
-                value={customor.name || ""}
-                onChange={(e) => handleInputChange(e, index)}
-                required
-              />
-            </div>
-            <div className="input-group">
-              <label>전화번호:</label>
-              <input
-                type="tel"
-                name="phone"
-                value={customor.phone || ""}
-                onChange={(e) => handleInputChange(e, index)}
-                required
-              />
-            </div>
-            <div className="input-group">
-              <label>병원명:</label>
-              <input
-                type="text"
-                name="hospital_name"
-                value={customor.url_code_setting?.hospital_name || ""}
-                readOnly
-              />
-            </div>
-            <div className="input-group">
-              <label>광고 제목:</label>
-              <input
-                type="text"
-                name="ad_title"
-                value={customor.url_code_setting?.ad_title || ""}
-                readOnly
-              />
-            </div>
-            <div className="input-group">
-              <label>1차 예약 상태:</label>
-              <input
-                type="text"
-                name="initial_status"
-                value={customor.initial_status || ""}
-                onChange={(e) => handleInputChange(e, index)}
-              />
-            </div>
-            <div className="input-group">
-              <label>부재 횟수:</label>
-              <input
-                type="number"
-                name="no_answer_count"
-                value={customor.no_answer_count || 0}
-                onChange={(e) => handleInputChange(e, index)}
-              />
-            </div>
-            <div className="input-group">
-              <label>재통화 요청일:</label>
-              <input
-                type="date"
-                name="recall_request_at"
-                value={customor.recall_request_at?.split("T")[0] || ""}
-                onChange={(e) => handleInputChange(e, index)}
-              />
-            </div>
-            <div className="input-group">
-              <label>예약일:</label>
-              <input
-                type="date"
-                name="reservation_date"
-                value={customor.reservation_date?.split("T")[0] || ""}
-                onChange={(e) => handleInputChange(e, index)}
-              />
-            </div>
-            <div className="input-group">
-              <label>방문 상태:</label>
-              <input
-                type="text"
-                name="visit_status"
-                value={customor.visit_status || ""}
-                onChange={(e) => handleInputChange(e, index)}
-              />
-            </div>
-            <div className="input-group">
-              <label>배당 여부:</label>
-              <input
-                type="text"
-                name="dividend_status"
-                value={customor.dividend_status || ""}
-                onChange={(e) => handleInputChange(e, index)}
-              />
-            </div>
-            <div className="input-group">
-              <label>일자:</label>
-              <input
-                type="date"
-                name="date"
-                value={customor.date?.split("T")[0] || ""}
-                onChange={(e) => handleInputChange(e, index)}
-              />
-            </div>
-            <button
-              className="submit-button"
-              onClick={() => handleSubmit(index)}
-            >
-              수정하기
-            </button>
-          </div>
-        ))}
-      </div>
+      <table className="customor-table">
+        <thead>
+          <tr>
+            <th>이름</th>
+            <th>전화번호</th>
+            <th>병원명</th>
+            <th>광고 제목</th>
+            <th>1차 예약 상태</th>
+            <th>부재 횟수</th>
+            <th>재통화 요청일</th>
+            <th>예약일</th>
+            <th>방문 상태</th>
+            <th>배당 여부</th>
+            <th>일자</th>
+            <th>수정</th>
+          </tr>
+        </thead>
+        <tbody>
+          {customors.map((customor, index) => (
+            <tr key={customor.id}>
+              <td>{customor.name}</td>
+              <td>{customor.phone}</td>
+              <td>
+                {customor.url_code_setting
+                  ? customor.url_code_setting.hospital_name
+                  : ""}
+              </td>
+              <td>
+                {customor.url_code_setting
+                  ? customor.url_code_setting.ad_title
+                  : ""}
+              </td>
+              <td>
+                <input
+                  type="text"
+                  name="initial_status"
+                  value={customor.initial_status || ""}
+                  onChange={(e) => handleInputChange(e, index)}
+                  disabled={!editState[customor.id]}
+                />
+              </td>
+              <td>
+                <input
+                  type="number"
+                  name="no_answer_count"
+                  value={customor.no_answer_count || 0}
+                  onChange={(e) => handleInputChange(e, index)}
+                  disabled={!editState[customor.id]}
+                />
+              </td>
+              <td>
+                {customor.recall_request_at
+                  ? customor.recall_request_at.split("T")[0]
+                  : ""}
+              </td>
+              <td>
+                {customor.reservation_date
+                  ? customor.reservation_date.split("T")[0]
+                  : ""}
+              </td>
+              <td>
+                <input
+                  type="text"
+                  name="visit_status"
+                  value={customor.visit_status || ""}
+                  onChange={(e) => handleInputChange(e, index)}
+                  disabled={!editState[customor.id]}
+                />
+              </td>
+              <td>
+                <input
+                  type="text"
+                  name="dividend_status"
+                  value={customor.dividend_status || ""}
+                  onChange={(e) => handleInputChange(e, index)}
+                  disabled={!editState[customor.id]}
+                />
+              </td>
+              <td>{customor.date ? customor.date.split("T")[0] : ""}</td>
+              <td>
+                {editState[customor.id] ? (
+                  <button
+                    className="submit-button"
+                    onClick={() => handleSubmit(index)}
+                  >
+                    저장하기
+                  </button>
+                ) : (
+                  <button
+                    className="edit-button"
+                    onClick={() => handleEdit(customor.id)}
+                  >
+                    수정하기
+                  </button>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
       <style jsx>{`
         .container {
           padding: 20px;
           max-width: 100%;
           overflow-x: auto;
-          white-space: nowrap;
         }
 
         h2 {
@@ -186,50 +183,35 @@ function CustomorDataPage() {
           text-align: center;
         }
 
-        .card-container {
-          display: flex;
-          flex-wrap: nowrap;
-          gap: 20px;
-        }
-
-        .card {
-          border: 1px solid #ccc;
-          border-radius: 5px;
-          padding: 20px;
-          min-width: 300px;
-          max-width: 300px;
-          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-          display: inline-block;
-          vertical-align: top;
-        }
-
-        .input-group {
-          margin-bottom: 10px;
-        }
-
-        label {
-          display: block;
-          margin-bottom: 5px;
-          font-weight: bold;
-        }
-
-        input {
-          padding: 8px;
+        .customor-table {
           width: 100%;
-          box-sizing: border-box;
+          border-collapse: collapse;
         }
 
-        .submit-button {
-          padding: 10px 20px;
+        th, td {
+          border: 1px solid #ccc;
+          padding: 10px;
+          text-align left;
+        }
+
+        th {
+          background-color: #eee;
+        }
+
+        input[disabled] {
+          background-color: #f9f9f9;
+          color: #666;
+        }
+
+        .submit-button, .edit-button {
+          padding: 5px 10px;
           background-color: #007bff;
           color: white;
           border: none;
           cursor: pointer;
-          margin-top: 10px;
-          width: 100%;
         }
 
-        .submit-button:hover {
+        .submit-button:hover, .edit-button:hover {
           background-color: #0056b3;
         }
       `}</style>
