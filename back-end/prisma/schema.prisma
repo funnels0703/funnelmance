@@ -56,6 +56,8 @@ model customor_db {
   reservation_date  DateTime?         @db.Timestamp(0)
   visit_status      String?           @db.VarChar(50)
   url_code          String?           @db.VarChar(255)
+  created_at        DateTime?         @default(now()) @db.Timestamp(0)
+  data_status       Int?              @default(0) @db.TinyInt
   url_code_setting  url_code_setting? @relation(fields: [url_code], references: [url_code], onDelete: NoAction, onUpdate: NoAction, map: "fk_url_code")
 
   @@unique([phone, url_code], map: "phone_url_code_unique")
