@@ -67,26 +67,26 @@ function CustomorDataPage({ title, get_status, put_status }) {
     }
   };
 
-  const handlePermanentDelete = async () => {
-    const selectedIds = customors
-      .filter((customor) => customor.isSelected)
-      .map((customor) => customor.id);
-    if (selectedIds.length > 0) {
-      try {
-        const response = await axios.delete(`/api/customor/delete`, {
-          data: { ids: selectedIds },
-        });
-        console.log("Permanent delete successful:", response.data);
-        alert("선택한 데이터가 영구적으로 삭제되었습니다.");
-        await fetchData(); // 삭제 후 데이터 새로고침
-      } catch (error) {
-        console.error("Error during permanent deletion:", error);
-        alert("영구 삭제 중 오류가 발생했습니다.");
-      }
-    } else {
-      alert("삭제할 데이터를 선택하세요.");
-    }
-  };
+  // const handlePermanentDelete = async () => {
+  //   const selectedIds = customors
+  //     .filter((customor) => customor.isSelected)
+  //     .map((customor) => customor.id);
+  //   if (selectedIds.length > 0) {
+  //     try {
+  //       const response = await axios.delete(`/api/customor/delete`, {
+  //         data: { ids: selectedIds },
+  //       });
+  //       console.log("Permanent delete successful:", response.data);
+  //       alert("선택한 데이터가 영구적으로 삭제되었습니다.");
+  //       await fetchData(); // 삭제 후 데이터 새로고침
+  //     } catch (error) {
+  //       console.error("Error during permanent deletion:", error);
+  //       alert("영구 삭제 중 오류가 발생했습니다.");
+  //     }
+  //   } else {
+  //     alert("삭제할 데이터를 선택하세요.");
+  //   }
+  // };
   const handleUpdateStatus = async () => {
     const selectedIds = customors
       .filter((customor) => customor.isSelected)
@@ -120,18 +120,9 @@ function CustomorDataPage({ title, get_status, put_status }) {
   return (
     <div className="container">
       <h2>{title}</h2>
-
       <button onClick={handleUpdateStatus} className="delete-button">
         {get_status === 1 ? "복원" : "삭제"}
       </button>
-      {get_status === 1 && (
-        <button
-          onClick={() => handlePermanentDelete()}
-          className="permanent-delete"
-        >
-          영구삭제
-        </button>
-      )}
       <table className="customor-table">
         <thead>
           <tr>
