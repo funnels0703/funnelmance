@@ -232,8 +232,8 @@ function CustomorDataPage({ title, get_status, put_status }) {
                             <td>
                                 <input
                                     type="text"
-                                    value={customor.code}
-                                    onChange={(e) => handleInputChange(index, 'code', e.target.value)}
+                                    value={customor.name}
+                                    onChange={(e) => handleInputChange(index, 'name', e.target.value)}
                                     disabled={!editState[customor.id]}
                                 />
                             </td>

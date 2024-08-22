@@ -37,7 +37,7 @@ const getAllCustomors = async (dataStatus) => {
 };
 // 필터
 const getFilteredCustomors = async (filters) => {
-    const { dividend_status, hospital_name, advertising_company, ad_title, url_code, code, phone, date, data_status } =
+    const { dividend_status, hospital_name, advertising_company, ad_title, url_code, name, phone, date, data_status } =
         filters;
 
     const queryOptions = {
@@ -48,7 +48,7 @@ const getFilteredCustomors = async (filters) => {
                 phone ? { phone } : {},
                 url_code ? { url_code } : {},
                 date ? { created_at: new Date(date) } : {},
-                code ? { name: code } : {},
+                name ? { name: { contains: name } } : {}, // name 필드를 이용한 검색
                 {
                     url_code_setting: {
                         hospital_name: hospital_name ? { contains: hospital_name } : undefined,
