@@ -52,13 +52,10 @@ const fetchFilteredCustomorData = async (req, res) => {
         // 페이지네이션을 고려한 데이터 조회
         const filteredCustomorData = await getFilteredCustomors(filters, offset, limit);
 
-        if (!filteredCustomorData.length) {
-            return res.status(404).json({ error: '데이터를 찾을 수 없습니다.' });
-        }
-
+        // 빈 배열도 허용하여 200 OK 응답을 보냄
         res.json({
-            total: totalCount, // 총 데이터 개수
-            data: filteredCustomorData,
+            total: totalCount,
+            data: filteredCustomorData, // 필터링된 데이터가 없으면 빈 배열 반환
         });
     } catch (error) {
         console.error('Error fetching filtered customor data:', error);

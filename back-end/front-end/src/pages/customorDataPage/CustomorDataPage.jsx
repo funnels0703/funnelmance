@@ -146,14 +146,6 @@ function CustomorDataPage({ title, get_status, put_status }) {
         }
     };
 
-    if (loading) {
-        return <div>Loading...</div>;
-    }
-
-    if (error) {
-        return <div>{error}</div>;
-    }
-
     return (
         <div className="container">
             <h2>{title}</h2>
