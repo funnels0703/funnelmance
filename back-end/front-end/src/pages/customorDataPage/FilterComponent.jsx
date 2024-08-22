@@ -1,27 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-function FilterComponent({ onFilterChange }) {
-    const [filters, setFilters] = useState({
-        dividend_status: '',
-        hospital_name: '',
-        advertising_company: '',
-        ad_title: '',
-        url_code: '',
-        name: '',
-        phone: '',
-        date: '',
-    });
-
+function FilterComponent({ filters, onFilterChange, handleApplyFilters }) {
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFilters((prev) => ({
-            ...prev,
+        onFilterChange({
+            ...filters,
             [name]: value,
-        }));
-    };
-
-    const handleFilter = () => {
-        onFilterChange(filters);
+        });
     };
 
     return (
@@ -68,9 +53,9 @@ function FilterComponent({ onFilterChange }) {
                 <input type="text" name="phone" value={filters.phone} onChange={handleChange} placeholder="전화번호" />
                 <input type="date" name="date" value={filters.date} onChange={handleChange} />
             </div>
-            <button onClick={handleFilter} className="filter-button">
+            <button onClick={handleApplyFilters} className="filter-button">
                 필터 적용
-            </button>
+            </button>{' '}
             <style jsx>{`
                 .filter-container {
                     display: flex;
@@ -101,22 +86,6 @@ function FilterComponent({ onFilterChange }) {
                     input:focus {
                         border-color: #007bff;
                         outline: none;
-                    }
-
-                    .filter-button {
-                        align-self: flex-end;
-                        padding: 10px 20px;
-                        background-color: #007bff;
-                        color: white;
-                        border: none;
-                        border-radius: 4px;
-                        cursor: pointer;
-                        font-size: 14px;
-                        transition: background-color 0.3s ease;
-                    }
-
-                    .filter-button:hover {
-                        background-color: #0056b3;
                     }
                 }
             `}</style>

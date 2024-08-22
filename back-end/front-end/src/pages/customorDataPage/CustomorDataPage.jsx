@@ -8,6 +8,18 @@ function CustomorDataPage({ title, get_status, put_status }) {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(true);
 
+    // filters 상태를 CustomorDataPage에서 관리
+    const [filters, setFilters] = useState({
+        dividend_status: '',
+        hospital_name: '',
+        advertising_company: '',
+        ad_title: '',
+        url_code: '',
+        name: '',
+        phone: '',
+        date: '',
+    });
+
     useEffect(() => {
         fetchData(); // 초기 데이터를 불러옵니다.
     }, []);
@@ -42,7 +54,10 @@ function CustomorDataPage({ title, get_status, put_status }) {
         }
     };
 
-    const handleFilterChange = (filters) => {
+    const handleFilterChange = (newFilters) => {
+        setFilters(newFilters);
+    };
+    const handleApplyFilters = () => {
         fetchData(filters);
     };
 
@@ -126,7 +141,12 @@ function CustomorDataPage({ title, get_status, put_status }) {
         <div className="container">
             <h2>{title}</h2>
 
-            <FilterComponent onFilterChange={handleFilterChange} />
+            {/* filters 상태와 handleFilterChange 함수를 FilterComponent에 전달 */}
+            <FilterComponent
+                filters={filters}
+                onFilterChange={handleFilterChange}
+                handleApplyFilters={handleApplyFilters}
+            />
 
             <button onClick={handleUpdateStatus} className="delete-button">
                 {get_status === 1 ? '복원' : '삭제'}
@@ -249,6 +269,7 @@ function CustomorDataPage({ title, get_status, put_status }) {
                 </tbody>
             </table>
             <style jsx>{`
+        /* 기존 스타일 그대로 유지 */
         .container {
           padding: 20px;
           max-width: 100%;
