@@ -1,42 +1,50 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-function CustomorDataPage() {
+function CustomorDataPage({ title, get_status, put_status }) {
   const [customors, setCustomors] = useState([]);
   const [editState, setEditState] = useState({});
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`/api/customor`);
-        if (response.data.length > 0) {
-          setCustomors(response.data);
-          const initialState = {};
-          response.data.forEach((item) => {
-            initialState[item.id] = false; // 각 아이템 ID에 대해 수정 상태를 false로 초기화
-          });
-          setEditState(initialState);
-        } else {
-          setError("데이터가 없습니다.");
-        }
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setError("데이터를 불러오는 중 오류가 발생했습니다.");
-        setLoading(false);
-      }
-    };
-
     fetchData();
   }, []);
 
-  const handleInputChange = (e, index) => {
-    const { name, value } = e.target;
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(
+        `/api/customor?data_status=${get_status}`
+      );
+      if (response.data.length > 0) {
+        setCustomors(
+          response.data.map((customor) => ({
+            ...customor,
+            isSelected: false,
+          }))
+        );
+        const initialState = {};
+        response.data.forEach((item) => {
+          initialState[item.id] = false; // 각 아이템 ID에 대해 수정 상태를 false로 초기화
+        });
+        setEditState(initialState);
+      } else {
+        setError("데이터가 없습니다.");
+      }
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setError("데이터를 불러오는 중 오류가 발생했습니다.");
+      setLoading(false);
+    }
+  };
+
+  const handleCheckboxChange = (index) => {
     setCustomors((prevCustomors) =>
       prevCustomors.map((customor, i) =>
-        i === index ? { ...customor, [name]: value } : customor
+        i === index
+          ? { ...customor, isSelected: !customor.isSelected }
+          : customor
       )
     );
   };
@@ -59,6 +67,48 @@ function CustomorDataPage() {
     }
   };
 
+  const handlePermanentDelete = async () => {
+    const selectedIds = customors
+      .filter((customor) => customor.isSelected)
+      .map((customor) => customor.id);
+    if (selectedIds.length > 0) {
+      try {
+        const response = await axios.delete(`/api/customor/delete`, {
+          data: { ids: selectedIds },
+        });
+        console.log("Permanent delete successful:", response.data);
+        alert("선택한 데이터가 영구적으로 삭제되었습니다.");
+        await fetchData(); // 삭제 후 데이터 새로고침
+      } catch (error) {
+        console.error("Error during permanent deletion:", error);
+        alert("영구 삭제 중 오류가 발생했습니다.");
+      }
+    } else {
+      alert("삭제할 데이터를 선택하세요.");
+    }
+  };
+  const handleUpdateStatus = async () => {
+    const selectedIds = customors
+      .filter((customor) => customor.isSelected)
+      .map((customor) => customor.id);
+    if (selectedIds.length > 0) {
+      try {
+        const response = await axios.put(`/api/customor/update-status`, {
+          ids: selectedIds,
+          data_status: put_status,
+        });
+        console.log("Status updated successfully:", response.data);
+        alert("선택한 데이터가 삭제되었습니다.");
+        await fetchData(); // 상태 업데이트 후 데이터 새로고침
+      } catch (error) {
+        console.error("Error updating status:", error);
+        alert("선택한 데이터가 삭제 중 오류가 발생했습니다.");
+      }
+    } else {
+      alert("삭제할 데이터를 선택하세요.");
+    }
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -69,20 +119,31 @@ function CustomorDataPage() {
 
   return (
     <div className="container">
-      <h2>고객 데이터</h2>
+      <h2>{title}</h2>
+
+      <button onClick={handleUpdateStatus} className="delete-button">
+        {get_status === 1 ? "복원" : "삭제"}
+      </button>
+      {get_status === 1 && (
+        <button
+          onClick={() => handlePermanentDelete()}
+          className="permanent-delete"
+        >
+          영구삭제
+        </button>
+      )}
       <table className="customor-table">
         <thead>
           <tr>
+            <th>선택</th>
+            <th>No</th>
+            <th>배당 여부</th>
+            <th>병원명</th>
+            <th>매체</th>
+            <th>광고 제목</th>
+            <th>이벤트명</th>
             <th>이름</th>
             <th>전화번호</th>
-            <th>병원명</th>
-            <th>광고 제목</th>
-            <th>1차 예약 상태</th>
-            <th>부재 횟수</th>
-            <th>재통화 요청일</th>
-            <th>예약일</th>
-            <th>방문 상태</th>
-            <th>배당 여부</th>
             <th>일자</th>
             <th>수정</th>
           </tr>
@@ -90,65 +151,25 @@ function CustomorDataPage() {
         <tbody>
           {customors.map((customor, index) => (
             <tr key={customor.id}>
+              <td>
+                <input
+                  type="checkbox"
+                  checked={customor.isSelected}
+                  onChange={() => handleCheckboxChange(index)}
+                />
+              </td>
+              <td>{customor.id}</td>
+              <td>{customor.dividend_status}</td>
+              <td>{customor.url_code_setting?.hospital_name}</td>
+              <td>{customor.url_code_setting?.advertising_company}</td>
+              <td>{customor.url_code_setting?.ad_title}</td>
+              <td>{customor.url_code}</td>{" "}
+              {/* Assuming '이벤트명' is the URL code */}
               <td>{customor.name}</td>
               <td>{customor.phone}</td>
               <td>
-                {customor.url_code_setting
-                  ? customor.url_code_setting.hospital_name
-                  : ""}
+                {customor.created_at ? customor.created_at.split("T")[0] : ""}
               </td>
-              <td>
-                {customor.url_code_setting
-                  ? customor.url_code_setting.ad_title
-                  : ""}
-              </td>
-              <td>
-                <input
-                  type="text"
-                  name="initial_status"
-                  value={customor.initial_status || ""}
-                  onChange={(e) => handleInputChange(e, index)}
-                  disabled={!editState[customor.id]}
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  name="no_answer_count"
-                  value={customor.no_answer_count || 0}
-                  onChange={(e) => handleInputChange(e, index)}
-                  disabled={!editState[customor.id]}
-                />
-              </td>
-              <td>
-                {customor.recall_request_at
-                  ? customor.recall_request_at.split("T")[0]
-                  : ""}
-              </td>
-              <td>
-                {customor.reservation_date
-                  ? customor.reservation_date.split("T")[0]
-                  : ""}
-              </td>
-              <td>
-                <input
-                  type="text"
-                  name="visit_status"
-                  value={customor.visit_status || ""}
-                  onChange={(e) => handleInputChange(e, index)}
-                  disabled={!editState[customor.id]}
-                />
-              </td>
-              <td>
-                <input
-                  type="text"
-                  name="dividend_status"
-                  value={customor.dividend_status || ""}
-                  onChange={(e) => handleInputChange(e, index)}
-                  disabled={!editState[customor.id]}
-                />
-              </td>
-              <td>{customor.date ? customor.date.split("T")[0] : ""}</td>
               <td>
                 {editState[customor.id] ? (
                   <button
@@ -170,7 +191,6 @@ function CustomorDataPage() {
           ))}
         </tbody>
       </table>
-
       <style jsx>{`
         .container {
           padding: 20px;
@@ -181,6 +201,19 @@ function CustomorDataPage() {
         h2 {
           margin-bottom: 20px;
           text-align: center;
+        }
+
+        .delete-button {
+          margin-bottom: 10px;
+          padding: 10px 15px;
+          background-color: #dc3545;
+          color: white;
+          border: none;
+          cursor: pointer;
+        }
+        
+        .delete-button:hover {
+          background-color: #c82333;
         }
 
         .customor-table {
@@ -196,11 +229,6 @@ function CustomorDataPage() {
 
         th {
           background-color: #eee;
-        }
-
-        input[disabled] {
-          background-color: #f9f9f9;
-          color: #666;
         }
 
         .submit-button, .edit-button {

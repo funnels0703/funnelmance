@@ -4,12 +4,15 @@ const {
   getCustomorById,
   createCustomor,
   updateCustomor,
+  updateDataStatusModel,
+  deleteCustomors,
 } = require("../models/customorModels");
 
 // GET 요청: 모든 customor 데이터를 가져오기
 const fetchCustomorData = async (req, res) => {
   try {
-    const customorData = await getAllCustomors();
+    const { data_status } = req.query; // 쿼리에서 data_status 파라미터 추출
+    const customorData = await getAllCustomors(data_status);
 
     if (!customorData.length) {
       return res.status(404).json({ error: "데이터를 찾을 수 없습니다." });
@@ -84,9 +87,44 @@ const updateCustomorData = async (req, res) => {
   }
 };
 
+// 삭제 휴지통
+const updateDataStatus = async (req, res) => {
+  const { ids, data_status } = req.body;
+  // console.log(ids);
+  if (!Array.isArray(ids) || ids.length === 0) {
+    return res.status(400).json({ error: "업데이트할 ID를 제공해야 합니다." });
+  }
+
+  try {
+    const updated = await updateDataStatusModel(ids, data_status);
+    res.json({ message: `${updated.count}개의 데이터가 업데이트되었습니다.` });
+  } catch (error) {
+    console.error("Error updating data status:", error);
+    res.status(500).json({ error: "데이터 업데이트 중 오류가 발생했습니다." });
+  }
+};
+
+const handleDeleteCustomors = async (req, res) => {
+  const { ids } = req.body;
+  if (!ids || ids.length === 0) {
+    return res.status(400).send({ message: "No IDs provided for deletion." });
+  }
+
+  try {
+    const result = await deleteCustomors(ids);
+    return res.json({
+      message: `${result.count} customors were deleted permanently.`,
+    });
+  } catch (error) {
+    console.error("Failed to delete customors:", error);
+    return res.status(500).send({ message: "Error deleting customors." });
+  }
+};
 module.exports = {
   fetchCustomorData,
   fetchCustomorById,
   submitCustomorData,
   updateCustomorData,
+  updateDataStatus,
+  handleDeleteCustomors,
 };

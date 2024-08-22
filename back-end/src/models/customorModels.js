@@ -3,8 +3,8 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 // 모든 customor 데이터를 가져오기 (GET)
-const getAllCustomors = async () => {
-  return prisma.customor_db.findMany({
+const getAllCustomors = async (dataStatus) => {
+  const queryOptions = {
     select: {
       id: true,
       dividend_status: true,
@@ -17,6 +17,8 @@ const getAllCustomors = async () => {
       reservation_date: true,
       visit_status: true,
       url_code: true,
+      created_at: true,
+      data_status: true,
       url_code_setting: {
         select: {
           hospital_name: true,
@@ -25,7 +27,13 @@ const getAllCustomors = async () => {
         },
       },
     },
-  });
+  };
+
+  if (dataStatus) {
+    queryOptions.where = { data_status: parseInt(dataStatus) }; // `data_status` 필터 추가
+  }
+
+  return prisma.customor_db.findMany(queryOptions);
 };
 
 // 특정 ID의 customor 데이터 가져오기 (GET by ID)
@@ -96,9 +104,30 @@ const updateCustomor = async (id, data) => {
   });
 };
 
+//복원도 구현해야해서 data_status 받아오는걸로 구현해야함
+const updateDataStatusModel = async (ids, data_status) => {
+  return prisma.customor_db.updateMany({
+    where: {
+      id: { in: ids },
+    },
+    data: {
+      data_status: data_status,
+    },
+  });
+};
+
+const deleteCustomors = async (ids) => {
+  return await prisma.customor.deleteMany({
+    where: {
+      id: { in: ids },
+    },
+  });
+};
 module.exports = {
   getAllCustomors,
   getCustomorById,
   createCustomor,
   updateCustomor,
+  updateDataStatusModel,
+  deleteCustomors,
 };

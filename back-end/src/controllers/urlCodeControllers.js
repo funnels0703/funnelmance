@@ -86,6 +86,7 @@ async function postUrlCodeData(req, res) {
     res.status(500).json({ error: "Internal Server Error" });
   }
 }
+
 module.exports = {
   createUrlCodeController,
   // 접속처리
