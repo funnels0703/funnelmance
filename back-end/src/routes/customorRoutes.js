@@ -1,7 +1,7 @@
 // routes/customor.js
 const express = require('express');
 const {
-    fetchCustomorData,
+    // fetchCustomorData,
     submitCustomorData,
     updateCustomorData,
     updateDataStatus,
@@ -11,7 +11,7 @@ const {
 
 const router = express.Router();
 
-router.get('/', fetchCustomorData);
+// router.get('/', fetchCustomorData);
 router.post('/search', fetchFilteredCustomorData);
 router.post('/', submitCustomorData);
 router.delete('/delete', handleDeleteCustomors);

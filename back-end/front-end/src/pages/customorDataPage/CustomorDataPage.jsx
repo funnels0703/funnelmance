@@ -7,6 +7,9 @@ function CustomorDataPage({ title, get_status, put_status }) {
     const [editState, setEditState] = useState({});
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1); // 현재 페이지
+    const [totalPages, setTotalPages] = useState(1); // 전체 페이지 수
+    const limit = 10; // 한 페이지에 보여줄 데이터 수
 
     // filters 상태를 CustomorDataPage에서 관리
     const [filters, setFilters] = useState({
@@ -19,27 +22,41 @@ function CustomorDataPage({ title, get_status, put_status }) {
         phone: '',
         date: '',
     });
+    const handleNextPage = () => {
+        if (currentPage < totalPages) {
+            setCurrentPage((prevPage) => prevPage + 1);
+        }
+    };
 
+    const handlePrevPage = () => {
+        if (currentPage > 1) {
+            setCurrentPage((prevPage) => prevPage - 1);
+        }
+    };
     useEffect(() => {
-        fetchData(); // 초기 데이터를 불러옵니다.
-    }, []);
+        fetchData(filters); // currentPage가 변경될 때마다 데이터 가져오기
+    }, [currentPage, filters]);
 
     const fetchData = async (filters = {}) => {
         setLoading(true);
         try {
             const response = await axios.post('/api/customor/search', {
                 data_status: get_status,
+                page: currentPage, // 현재 페이지
+                limit, // 한 페이지에 보여줄 데이터 수
                 ...filters,
             });
-            if (response.data.length > 0) {
+
+            if (response.data.data.length > 0) {
                 setCustomors(
-                    response.data.map((customor) => ({
+                    response.data.data.map((customor) => ({
                         ...customor,
                         isSelected: false,
                     }))
                 );
+                setTotalPages(Math.ceil(response.data.total / limit)); // 총 페이지 수 계산
                 const initialState = {};
-                response.data.forEach((item) => {
+                response.data.data.forEach((item) => {
                     initialState[item.id] = false;
                 });
                 setEditState(initialState);
@@ -268,6 +285,17 @@ function CustomorDataPage({ title, get_status, put_status }) {
                     ))}
                 </tbody>
             </table>
+            <div className="pagination">
+                <button onClick={handlePrevPage} disabled={currentPage === 1}>
+                    이전
+                </button>
+                <span>
+                    {currentPage} / {totalPages}
+                </span>
+                <button onClick={handleNextPage} disabled={currentPage === totalPages}>
+                    다음
+                </button>
+            </div>
             <style jsx>{`
         /* 기존 스타일 그대로 유지 */
         .container {
@@ -329,6 +357,15 @@ function CustomorDataPage({ title, get_status, put_status }) {
         input:disabled {
           background-color: #f5f5f5;
           border: 1px solid #ddd;
+        }
+        .pagination {
+          display: flex;  
+          justify-content: center;
+            margin: 20px 0;
+        }
+        .pagination button {
+          margin: 0 5px;
+          padding: 5px 10px;
         }
       `}</style>
         </div>

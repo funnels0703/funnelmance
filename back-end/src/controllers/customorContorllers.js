@@ -7,36 +7,59 @@ const {
     updateDataStatusModel,
     deleteCustomors,
     getFilteredCustomors,
+    getTotalCustomorCount,
 } = require('../models/customorModels');
 
 // GET 요청: 모든 customor 데이터를 가져오기
-const fetchCustomorData = async (req, res) => {
-    try {
-        const { data_status } = req.query; // 쿼리에서 data_status 파라미터 추출
-        const customorData = await getAllCustomors(data_status);
+// const fetchCustomorData = async (req, res) => {
+//     try {
+//         const { data_status, page = 1, limit = 10 } = req.query; // 쿼리에서 data_status, page, limit 파라미터 추출
+//         const currentPage = parseInt(page);
+//         const recordsPerPage = parseInt(limit);
 
-        if (!customorData.length) {
-            return res.status(404).json({ error: '데이터를 찾을 수 없습니다.' });
-        }
+//         const [customorData, totalRecords] = await getAllCustomors(data_status, currentPage, recordsPerPage);
 
-        res.json(customorData);
-    } catch (error) {
-        console.error('Error fetching customor data:', error);
-        res.status(500).json({ error: '서버 오류입니다.' });
-    }
-};
+//         if (!customorData.length) {
+//             return res.status(404).json({ error: '데이터를 찾을 수 없습니다.' });
+//         }
+
+//         const totalPages = Math.ceil(totalRecords / recordsPerPage);
+
+//         res.json({
+//             data: customorData,
+//             pagination: {
+//                 totalRecords,
+//                 totalPages,
+//                 currentPage,
+//                 recordsPerPage,
+//             },
+//         });
+//     } catch (error) {
+//         console.error('Error fetching customor data:', error);
+//         res.status(500).json({ error: '서버 오류입니다.' });
+//     }
+// };
 
 // GET 요청 필터 POST
 const fetchFilteredCustomorData = async (req, res) => {
     try {
-        const filters = req.body; // POST 요청 바디에서 필터 파라미터 추출
-        const filteredCustomorData = await getFilteredCustomors(filters);
+        const { page = 1, limit = 10, ...filters } = req.body;
+        const offset = (page - 1) * limit;
+
+        // 총 데이터 개수를 가져옴
+        const totalCount = await getTotalCustomorCount(filters);
+
+        // 페이지네이션을 고려한 데이터 조회
+        const filteredCustomorData = await getFilteredCustomors(filters, offset, limit);
 
         if (!filteredCustomorData.length) {
             return res.status(404).json({ error: '데이터를 찾을 수 없습니다.' });
         }
 
-        res.json(filteredCustomorData);
+        res.json({
+            total: totalCount, // 총 데이터 개수
+            data: filteredCustomorData,
+        });
     } catch (error) {
         console.error('Error fetching filtered customor data:', error);
         res.status(500).json({ error: '서버 오류입니다.' });
@@ -139,7 +162,7 @@ const handleDeleteCustomors = async (req, res) => {
     }
 };
 module.exports = {
-    fetchCustomorData,
+    // fetchCustomorData,
     fetchFilteredCustomorData,
     fetchCustomorById,
     submitCustomorData,

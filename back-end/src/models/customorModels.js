@@ -3,40 +3,48 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 // 모든 customor 데이터를 가져오기 (GET)
-const getAllCustomors = async (dataStatus) => {
-    const queryOptions = {
-        select: {
-            id: true,
-            dividend_status: true,
-            date: true,
-            name: true,
-            phone: true,
-            initial_status: true,
-            no_answer_count: true,
-            recall_request_at: true,
-            reservation_date: true,
-            visit_status: true,
-            url_code: true,
-            created_at: true,
-            data_status: true,
-            url_code_setting: {
-                select: {
-                    hospital_name: true,
-                    advertising_company: true,
-                    ad_title: true,
-                },
-            },
-        },
-    };
+// const getAllCustomors = async (dataStatus, page, limit) => {
+//     const queryOptions = {
+//         select: {
+//             id: true,
+//             dividend_status: true,
+//             date: true,
+//             name: true,
+//             phone: true,
+//             initial_status: true,
+//             no_answer_count: true,
+//             recall_request_at: true,
+//             reservation_date: true,
+//             visit_status: true,
+//             url_code: true,
+//             created_at: true,
+//             data_status: true,
+//             url_code_setting: {
+//                 select: {
+//                     hospital_name: true,
+//                     advertising_company: true,
+//                     ad_title: true,
+//                 },
+//             },
+//         },
+//         skip: (page - 1) * limit, // 페이지네이션을 위한 OFFSET
+//         take: limit, // 페이지네이션을 위한 LIMIT
+//     };
 
-    if (dataStatus) {
-        queryOptions.where = { data_status: parseInt(dataStatus) }; // `data_status` 필터 추가
-    }
+//     if (dataStatus) {
+//         queryOptions.where = { data_status: parseInt(dataStatus) }; // `data_status` 필터 추가
+//     }
 
-    return prisma.customor_db.findMany(queryOptions);
-};
+//     const customorData = await prisma.customor_db.findMany(queryOptions);
+
+//     const totalRecords = await prisma.customor_db.count({
+//         where: dataStatus ? { data_status: parseInt(dataStatus) } : {}, // 전체 레코드 수를 계산
+//     });
+
+//     return [customorData, totalRecords];
+// };
 // 필터
-const getFilteredCustomors = async (filters) => {
+const getFilteredCustomors = async (filters, offset = 0, limit = 10) => {
     const { dividend_status, hospital_name, advertising_company, ad_title, url_code, name, phone, date, data_status } =
         filters;
 
@@ -48,7 +56,7 @@ const getFilteredCustomors = async (filters) => {
                 phone ? { phone } : {},
                 url_code ? { url_code } : {},
                 date ? { created_at: new Date(date) } : {},
-                name ? { name: { contains: name } } : {}, // name 필드를 이용한 검색
+                name ? { name: { contains: name } } : {},
                 {
                     url_code_setting: {
                         hospital_name: hospital_name ? { contains: hospital_name } : undefined,
@@ -80,11 +88,38 @@ const getFilteredCustomors = async (filters) => {
                 },
             },
         },
+        skip: offset,
+        take: limit,
     };
 
     return prisma.customor_db.findMany(queryOptions);
 };
+const getTotalCustomorCount = async (filters) => {
+    const { dividend_status, hospital_name, advertising_company, ad_title, url_code, name, phone, date, data_status } =
+        filters;
 
+    const countOptions = {
+        where: {
+            AND: [
+                data_status ? { data_status: parseInt(data_status) } : {},
+                dividend_status ? { dividend_status } : {},
+                phone ? { phone } : {},
+                url_code ? { url_code } : {},
+                date ? { created_at: new Date(date) } : {},
+                name ? { name: { contains: name } } : {},
+                {
+                    url_code_setting: {
+                        hospital_name: hospital_name ? { contains: hospital_name } : undefined,
+                        advertising_company: advertising_company ? { contains: advertising_company } : undefined,
+                        ad_title: ad_title ? { contains: ad_title } : undefined,
+                    },
+                },
+            ],
+        },
+    };
+
+    return prisma.customor_db.count(countOptions);
+};
 // 특정 ID의 customor 데이터 가져오기 (GET by ID)
 const getCustomorById = async (id) => {
     return prisma.customor_db.findUnique({
@@ -169,8 +204,9 @@ const deleteCustomors = async (ids) => {
     });
 };
 module.exports = {
-    getAllCustomors,
+    // getAllCustomors,
     getFilteredCustomors,
+    getTotalCustomorCount,
     getCustomorById,
     createCustomor,
     updateCustomor,
