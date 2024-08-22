@@ -35,7 +35,7 @@ function CustomorDataPage({ title, get_status, put_status }) {
     };
     useEffect(() => {
         fetchData(filters); // currentPage가 변경될 때마다 데이터 가져오기
-    }, [currentPage, filters]);
+    }, [currentPage]);
 
     const fetchData = async (filters = {}) => {
         setLoading(true);
