@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import FilterComponent from './FilterComponent';
 
 function CustomorDataPage({ title, get_status, put_status }) {
     const [customors, setCustomors] = useState([]);
@@ -8,12 +9,16 @@ function CustomorDataPage({ title, get_status, put_status }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetchData();
+        fetchData(); // 초기 데이터를 불러옵니다.
     }, []);
 
-    const fetchData = async () => {
+    const fetchData = async (filters = {}) => {
+        setLoading(true);
         try {
-            const response = await axios.get(`/api/customor?data_status=${get_status}`);
+            const response = await axios.post('/api/customor/search', {
+                data_status: get_status,
+                ...filters,
+            });
             if (response.data.length > 0) {
                 setCustomors(
                     response.data.map((customor) => ({
@@ -23,7 +28,7 @@ function CustomorDataPage({ title, get_status, put_status }) {
                 );
                 const initialState = {};
                 response.data.forEach((item) => {
-                    initialState[item.id] = false; // 각 아이템 ID에 대해 수정 상태를 false로 초기화
+                    initialState[item.id] = false;
                 });
                 setEditState(initialState);
             } else {
@@ -35,6 +40,10 @@ function CustomorDataPage({ title, get_status, put_status }) {
             setError('데이터를 불러오는 중 오류가 발생했습니다.');
             setLoading(false);
         }
+    };
+
+    const handleFilterChange = (filters) => {
+        fetchData(filters);
     };
 
     const handleCheckboxChange = (index) => {
@@ -75,7 +84,7 @@ function CustomorDataPage({ title, get_status, put_status }) {
                 });
                 console.log('Permanent delete successful:', response.data);
                 alert('선택한 데이터가 영구적으로 삭제되었습니다.');
-                await fetchData(); // 삭제 후 데이터 새로고침
+                await fetchData();
             } catch (error) {
                 console.error('Error during permanent deletion:', error);
                 alert('영구 삭제 중 오류가 발생했습니다.');
@@ -84,6 +93,7 @@ function CustomorDataPage({ title, get_status, put_status }) {
             alert('삭제할 데이터를 선택하세요.');
         }
     };
+
     const handleUpdateStatus = async () => {
         const selectedIds = customors.filter((customor) => customor.isSelected).map((customor) => customor.id);
         if (selectedIds.length > 0) {
@@ -94,7 +104,7 @@ function CustomorDataPage({ title, get_status, put_status }) {
                 });
                 console.log('Status updated successfully:', response.data);
                 alert('선택한 데이터가 삭제되었습니다.');
-                await fetchData(); // 상태 업데이트 후 데이터 새로고침
+                await fetchData();
             } catch (error) {
                 console.error('Error updating status:', error);
                 alert('선택한 데이터가 삭제 중 오류가 발생했습니다.');
@@ -116,6 +126,8 @@ function CustomorDataPage({ title, get_status, put_status }) {
         <div className="container">
             <h2>{title}</h2>
 
+            <FilterComponent onFilterChange={handleFilterChange} />
+
             <button onClick={handleUpdateStatus} className="delete-button">
                 {get_status === 1 ? '복원' : '삭제'}
             </button>
@@ -133,7 +145,7 @@ function CustomorDataPage({ title, get_status, put_status }) {
                         <th>병원명</th>
                         <th>매체</th>
                         <th>광고 제목</th>
-                        <th>이벤트명</th>
+                        <th>코드</th>
                         <th>이름</th>
                         <th>전화번호</th>
                         <th>일자</th>
@@ -200,8 +212,8 @@ function CustomorDataPage({ title, get_status, put_status }) {
                             <td>
                                 <input
                                     type="text"
-                                    value={customor.name}
-                                    onChange={(e) => handleInputChange(index, 'name', e.target.value)}
+                                    value={customor.code}
+                                    onChange={(e) => handleInputChange(index, 'code', e.target.value)}
                                     disabled={!editState[customor.id]}
                                 />
                             </td>
