@@ -43,28 +43,29 @@ function CustomorDataPage({ title, get_status, put_status }) {
     try {
       const response = await axios.post("/api/customor/search", {
         data_status: get_status,
-        page: currentPage, // 현재 페이지
-        limit, // 한 페이지에 보여줄 데이터 수
+        page: currentPage,
+        limit,
         ...filters,
       });
 
-      if (response.data.data.length > 0) {
+      if (response.data.total > 0) {
         setCustomors(
           response.data.data.map((customor) => ({
             ...customor,
             isSelected: false,
           }))
         );
-        setTotalPages(Math.ceil(response.data.total / limit)); // 총 페이지 수 계산
+        setTotalPages(Math.ceil(response.data.total / limit));
         const initialState = {};
         response.data.data.forEach((item) => {
           initialState[item.id] = false;
         });
         setRecentSettings(response.data.recentSettings);
-
         setEditState(initialState);
       } else {
-        setError("데이터가 없습니다.");
+        // total이 0일 경우
+        setCustomors([]); // 빈 배열로 설정
+        setTotalPages(1); // 페이지를 1로 설정
       }
       setLoading(false);
     } catch (error) {
@@ -72,6 +73,13 @@ function CustomorDataPage({ title, get_status, put_status }) {
       setError("데이터를 불러오는 중 오류가 발생했습니다.");
       setLoading(false);
     }
+  };
+
+  // 매체 필터링 버튼 클릭 핸들러
+  const handleMediaFilter = (company) => {
+    const updatedFilters = { ...filters, advertising_company: company };
+    setFilters(updatedFilters);
+    fetchData(updatedFilters);
   };
 
   const handleFilterChange = (newFilters) => {
@@ -170,6 +178,12 @@ function CustomorDataPage({ title, get_status, put_status }) {
         onFilterChange={handleFilterChange}
         handleApplyFilters={handleApplyFilters}
       />
+      {/* 매체 필터 버튼들 */}
+      <div className="media-buttons">
+        <button onClick={() => handleMediaFilter("토스")}>토스</button>
+        <button onClick={() => handleMediaFilter("당근")}>당근</button>
+        <button onClick={() => handleMediaFilter("카카오")}>카카오</button>
+      </div>
       {/* 건 수 나오는 곳  */}
       <div className="recent-settings">
         <h3>최근 설정</h3>
@@ -213,129 +227,143 @@ function CustomorDataPage({ title, get_status, put_status }) {
         </thead>
         {/* 데이터 뿌려주는 부분 */}
         <tbody>
-          {customors.map((customor, index) => (
-            <tr key={customor.id}>
-              <td>
-                <input
-                  type="checkbox"
-                  checked={customor.isSelected}
-                  onChange={() => handleCheckboxChange(index)}
-                />
-              </td>
-              <td>{customor.id}</td>
-              <td>
-                <input
-                  type="text"
-                  value={customor.dividend_status}
-                  onChange={(e) =>
-                    handleInputChange(index, "dividend_status", e.target.value)
-                  }
-                  disabled={!editState[customor.id]}
-                />
-              </td>
-              <td>
-                <input
-                  type="text"
-                  value={customor.url_code_setting?.hospital_name}
-                  onChange={(e) =>
-                    handleInputChange(
-                      index,
-                      "url_code_setting.hospital_name",
-                      e.target.value
-                    )
-                  }
-                  disabled={!editState[customor.id]}
-                />
-              </td>
-              <td>
-                <input
-                  type="text"
-                  value={customor.url_code_setting?.advertising_company}
-                  onChange={(e) =>
-                    handleInputChange(
-                      index,
-                      "url_code_setting.advertising_company",
-                      e.target.value
-                    )
-                  }
-                  disabled={!editState[customor.id]}
-                />
-              </td>
-              <td>
-                <input
-                  type="text"
-                  value={customor.url_code_setting?.ad_title}
-                  onChange={(e) =>
-                    handleInputChange(
-                      index,
-                      "url_code_setting.ad_title",
-                      e.target.value
-                    )
-                  }
-                  disabled={!editState[customor.id]}
-                />
-              </td>
-              <td>
-                <input
-                  type="text"
-                  value={customor.url_code}
-                  onChange={(e) =>
-                    handleInputChange(index, "url_code", e.target.value)
-                  }
-                  disabled={!editState[customor.id]}
-                />
-              </td>
-              <td>
-                <input
-                  type="text"
-                  value={customor.name}
-                  onChange={(e) =>
-                    handleInputChange(index, "name", e.target.value)
-                  }
-                  disabled={!editState[customor.id]}
-                />
-              </td>
-              <td>
-                <input
-                  type="text"
-                  value={customor.phone}
-                  onChange={(e) =>
-                    handleInputChange(index, "phone", e.target.value)
-                  }
-                  disabled={!editState[customor.id]}
-                />
-              </td>
-              <td>
-                <input
-                  type="text"
-                  value={
-                    customor.created_at ? customor.created_at.split("T")[0] : ""
-                  }
-                  onChange={(e) =>
-                    handleInputChange(index, "created_at", e.target.value)
-                  }
-                  disabled={!editState[customor.id]}
-                />
-              </td>
-              <td>
-                {editState[customor.id] ? (
-                  <button
-                    className="submit-button"
-                    onClick={() => handleSubmit(index)}
-                  >
-                    저장하기
-                  </button>
-                ) : (
-                  <button
-                    className="edit-button"
-                    onClick={() => handleEdit(customor.id)}
-                  >
-                    수정하기
-                  </button>
-                )}
+          {totalPages === 0 ? (
+            <tr>
+              <td colSpan="11" style={{ textAlign: "center", padding: "20px" }}>
+                아직 데이터가 없습니다.
               </td>
             </tr>
-          ))}
+          ) : (
+            customors.map((customor, index) => (
+              <tr key={customor.id}>
+                <td>
+                  <input
+                    type="checkbox"
+                    checked={customor.isSelected}
+                    onChange={() => handleCheckboxChange(index)}
+                  />
+                </td>
+                <td>{customor.id}</td>
+                <td>
+                  <input
+                    type="text"
+                    value={customor.dividend_status}
+                    onChange={(e) =>
+                      handleInputChange(
+                        index,
+                        "dividend_status",
+                        e.target.value
+                      )
+                    }
+                    disabled={!editState[customor.id]}
+                  />
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    value={customor.url_code_setting?.hospital_name}
+                    onChange={(e) =>
+                      handleInputChange(
+                        index,
+                        "url_code_setting.hospital_name",
+                        e.target.value
+                      )
+                    }
+                    disabled={!editState[customor.id]}
+                  />
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    value={customor.url_code_setting?.advertising_company}
+                    onChange={(e) =>
+                      handleInputChange(
+                        index,
+                        "url_code_setting.advertising_company",
+                        e.target.value
+                      )
+                    }
+                    disabled={!editState[customor.id]}
+                  />
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    value={customor.url_code_setting?.ad_title}
+                    onChange={(e) =>
+                      handleInputChange(
+                        index,
+                        "url_code_setting.ad_title",
+                        e.target.value
+                      )
+                    }
+                    disabled={!editState[customor.id]}
+                  />
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    value={customor.url_code}
+                    onChange={(e) =>
+                      handleInputChange(index, "url_code", e.target.value)
+                    }
+                    disabled={!editState[customor.id]}
+                  />
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    value={customor.name}
+                    onChange={(e) =>
+                      handleInputChange(index, "name", e.target.value)
+                    }
+                    disabled={!editState[customor.id]}
+                  />
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    value={customor.phone}
+                    onChange={(e) =>
+                      handleInputChange(index, "phone", e.target.value)
+                    }
+                    disabled={!editState[customor.id]}
+                  />
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    value={
+                      customor.created_at
+                        ? customor.created_at.split("T")[0]
+                        : ""
+                    }
+                    onChange={(e) =>
+                      handleInputChange(index, "created_at", e.target.value)
+                    }
+                    disabled={!editState[customor.id]}
+                  />
+                </td>
+                <td>
+                  {editState[customor.id] ? (
+                    <button
+                      className="submit-button"
+                      onClick={() => handleSubmit(index)}
+                    >
+                      저장하기
+                    </button>
+                  ) : (
+                    <button
+                      className="edit-button"
+                      onClick={() => handleEdit(customor.id)}
+                    >
+                      수정하기
+                    </button>
+                  )}
+                </td>
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
       <div className="pagination">
@@ -419,6 +447,26 @@ function CustomorDataPage({ title, get_status, put_status }) {
         .pagination button {
           margin: 0 5px;
           padding: 5px 10px;
+        }
+        {/* 버튼  */}
+        .media-buttons {
+          margin-bottom: 20px;
+          text-align: center;
+        }
+
+        .media-buttons button {
+          margin: 0 10px;
+          padding: 10px 20px;
+          background-color: #007bff;
+          color: white;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+          transition: background-color 0.3s;
+        }
+
+        .media-buttons button:hover {
+          background-color: #0056b3;
         }
         {/* 카드쪽  */}
         .recent-settings {
