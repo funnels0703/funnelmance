@@ -1,294 +1,352 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import FilterComponent from './FilterComponent';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import FilterComponent from "./FilterComponent";
 
 function CustomorDataPage({ title, get_status, put_status }) {
-    const [customors, setCustomors] = useState([]);
-    const [editState, setEditState] = useState({});
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(true);
-    const [currentPage, setCurrentPage] = useState(1); // 현재 페이지
-    const [totalPages, setTotalPages] = useState(1); // 전체 페이지 수
-    const limit = 10; // 한 페이지에 보여줄 데이터 수
+  const [customors, setCustomors] = useState([]);
+  const [editState, setEditState] = useState({});
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1); // 현재 페이지
+  const [totalPages, setTotalPages] = useState(1); // 전체 페이지 수
+  const limit = 10; // 한 페이지에 보여줄 데이터 수
+  const [recentSettings, setRecentSettings] = useState([]);
 
-    // filters 상태를 CustomorDataPage에서 관리
-    const [filters, setFilters] = useState({
-        dividend_status: '',
-        hospital_name: '',
-        advertising_company: '',
-        ad_title: '',
-        url_code: '',
-        name: '',
-        phone: '',
-        date: '',
-    });
-    const handleNextPage = () => {
-        if (currentPage < totalPages) {
-            setCurrentPage((prevPage) => prevPage + 1);
-        }
-    };
+  // filters 상태를 CustomorDataPage에서 관리
+  const [filters, setFilters] = useState({
+    dividend_status: "",
+    hospital_name: "",
+    advertising_company: "",
+    ad_title: "",
+    url_code: "",
+    name: "",
+    phone: "",
+    date: "",
+  });
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage((prevPage) => prevPage + 1);
+    }
+  };
 
-    const handlePrevPage = () => {
-        if (currentPage > 1) {
-            setCurrentPage((prevPage) => prevPage - 1);
-        }
-    };
-    useEffect(() => {
-        fetchData(filters); // currentPage가 변경될 때마다 데이터 가져오기
-    }, [currentPage]);
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prevPage) => prevPage - 1);
+    }
+  };
+  useEffect(() => {
+    fetchData(filters); // currentPage가 변경될 때마다 데이터 가져오기
+  }, [currentPage]);
 
-    const fetchData = async (filters = {}) => {
-        setLoading(true);
-        try {
-            const response = await axios.post('/api/customor/search', {
-                data_status: get_status,
-                page: currentPage, // 현재 페이지
-                limit, // 한 페이지에 보여줄 데이터 수
-                ...filters,
-            });
+  const fetchData = async (filters = {}) => {
+    setLoading(true);
+    try {
+      const response = await axios.post("/api/customor/search", {
+        data_status: get_status,
+        page: currentPage, // 현재 페이지
+        limit, // 한 페이지에 보여줄 데이터 수
+        ...filters,
+      });
 
-            if (response.data.data.length > 0) {
-                setCustomors(
-                    response.data.data.map((customor) => ({
-                        ...customor,
-                        isSelected: false,
-                    }))
-                );
-                setTotalPages(Math.ceil(response.data.total / limit)); // 총 페이지 수 계산
-                const initialState = {};
-                response.data.data.forEach((item) => {
-                    initialState[item.id] = false;
-                });
-                setEditState(initialState);
-            } else {
-                setError('데이터가 없습니다.');
-            }
-            setLoading(false);
-        } catch (error) {
-            console.error('Error fetching data:', error);
-            setError('데이터를 불러오는 중 오류가 발생했습니다.');
-            setLoading(false);
-        }
-    };
-
-    const handleFilterChange = (newFilters) => {
-        setFilters(newFilters);
-    };
-    const handleApplyFilters = () => {
-        fetchData(filters);
-    };
-
-    const handleCheckboxChange = (index) => {
-        setCustomors((prevCustomors) =>
-            prevCustomors.map((customor, i) =>
-                i === index ? { ...customor, isSelected: !customor.isSelected } : customor
-            )
+      if (response.data.data.length > 0) {
+        setCustomors(
+          response.data.data.map((customor) => ({
+            ...customor,
+            isSelected: false,
+          }))
         );
-    };
+        setTotalPages(Math.ceil(response.data.total / limit)); // 총 페이지 수 계산
+        const initialState = {};
+        response.data.data.forEach((item) => {
+          initialState[item.id] = false;
+        });
+        setRecentSettings(response.data.recentSettings);
 
-    const handleEdit = (id) => {
-        setEditState((prev) => ({ ...prev, [id]: true }));
-    };
+        setEditState(initialState);
+      } else {
+        setError("데이터가 없습니다.");
+      }
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setError("데이터를 불러오는 중 오류가 발생했습니다.");
+      setLoading(false);
+    }
+  };
 
-    const handleInputChange = (index, field, value) => {
-        setCustomors((prevCustomors) =>
-            prevCustomors.map((customor, i) => (i === index ? { ...customor, [field]: value } : customor))
-        );
-    };
+  const handleFilterChange = (newFilters) => {
+    setFilters(newFilters);
+  };
+  const handleApplyFilters = () => {
+    fetchData(filters);
+  };
 
-    const handleSubmit = async (index) => {
-        const customor = customors[index];
-        try {
-            const response = await axios.put(`/api/customor/${customor.id}`, customor);
-            console.log('Data updated successfully:', response.data);
-            setEditState((prev) => ({ ...prev, [customor.id]: false }));
-        } catch (error) {
-            console.error('Error submitting data:', error);
-        }
-    };
+  const handleCheckboxChange = (index) => {
+    setCustomors((prevCustomors) =>
+      prevCustomors.map((customor, i) =>
+        i === index
+          ? { ...customor, isSelected: !customor.isSelected }
+          : customor
+      )
+    );
+  };
 
-    const handlePermanentDelete = async () => {
-        const selectedIds = customors.filter((customor) => customor.isSelected).map((customor) => customor.id);
-        if (selectedIds.length > 0) {
-            try {
-                const response = await axios.delete(`/api/customor/delete`, {
-                    data: { ids: selectedIds },
-                });
-                console.log('Permanent delete successful:', response.data);
-                alert('선택한 데이터가 영구적으로 삭제되었습니다.');
-                await fetchData();
-            } catch (error) {
-                console.error('Error during permanent deletion:', error);
-                alert('영구 삭제 중 오류가 발생했습니다.');
-            }
-        } else {
-            alert('삭제할 데이터를 선택하세요.');
-        }
-    };
+  const handleEdit = (id) => {
+    setEditState((prev) => ({ ...prev, [id]: true }));
+  };
 
-    const handleUpdateStatus = async () => {
-        const selectedIds = customors.filter((customor) => customor.isSelected).map((customor) => customor.id);
-        if (selectedIds.length > 0) {
-            try {
-                const response = await axios.put(`/api/customor/update-status`, {
-                    ids: selectedIds,
-                    data_status: put_status,
-                });
-                console.log('Status updated successfully:', response.data);
-                alert('선택한 데이터가 삭제되었습니다.');
-                await fetchData();
-            } catch (error) {
-                console.error('Error updating status:', error);
-                alert('선택한 데이터가 삭제 중 오류가 발생했습니다.');
-            }
-        } else {
-            alert('삭제할 데이터를 선택하세요.');
-        }
-    };
+  const handleInputChange = (index, field, value) => {
+    setCustomors((prevCustomors) =>
+      prevCustomors.map((customor, i) =>
+        i === index ? { ...customor, [field]: value } : customor
+      )
+    );
+  };
 
-    return (
-        <div className="container">
-            <h2>{title}</h2>
+  const handleSubmit = async (index) => {
+    const customor = customors[index];
+    try {
+      const response = await axios.put(
+        `/api/customor/${customor.id}`,
+        customor
+      );
+      console.log("Data updated successfully:", response.data);
+      setEditState((prev) => ({ ...prev, [customor.id]: false }));
+    } catch (error) {
+      console.error("Error submitting data:", error);
+    }
+  };
 
-            {/* filters 상태와 handleFilterChange 함수를 FilterComponent에 전달 */}
-            <FilterComponent
-                filters={filters}
-                onFilterChange={handleFilterChange}
-                handleApplyFilters={handleApplyFilters}
-            />
+  const handlePermanentDelete = async () => {
+    const selectedIds = customors
+      .filter((customor) => customor.isSelected)
+      .map((customor) => customor.id);
+    if (selectedIds.length > 0) {
+      try {
+        const response = await axios.delete(`/api/customor/delete`, {
+          data: { ids: selectedIds },
+        });
+        console.log("Permanent delete successful:", response.data);
+        alert("선택한 데이터가 영구적으로 삭제되었습니다.");
+        await fetchData();
+      } catch (error) {
+        console.error("Error during permanent deletion:", error);
+        alert("영구 삭제 중 오류가 발생했습니다.");
+      }
+    } else {
+      alert("삭제할 데이터를 선택하세요.");
+    }
+  };
 
-            <button onClick={handleUpdateStatus} className="delete-button">
-                {get_status === 1 ? '복원' : '삭제'}
-            </button>
-            {get_status === 1 && (
-                <button onClick={() => handlePermanentDelete()} className="permanent-delete">
-                    영구삭제
-                </button>
-            )}
-            <table className="customor-table">
-                <thead>
-                    <tr>
-                        <th>선택</th>
-                        <th>No</th>
-                        <th>배당 여부</th>
-                        <th>병원명</th>
-                        <th>매체</th>
-                        <th>광고 제목</th>
-                        <th>코드</th>
-                        <th>이름</th>
-                        <th>전화번호</th>
-                        <th>일자</th>
-                        <th>수정</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {customors.map((customor, index) => (
-                        <tr key={customor.id}>
-                            <td>
-                                <input
-                                    type="checkbox"
-                                    checked={customor.isSelected}
-                                    onChange={() => handleCheckboxChange(index)}
-                                />
-                            </td>
-                            <td>{customor.id}</td>
-                            <td>
-                                <input
-                                    type="text"
-                                    value={customor.dividend_status}
-                                    onChange={(e) => handleInputChange(index, 'dividend_status', e.target.value)}
-                                    disabled={!editState[customor.id]}
-                                />
-                            </td>
-                            <td>
-                                <input
-                                    type="text"
-                                    value={customor.url_code_setting?.hospital_name}
-                                    onChange={(e) =>
-                                        handleInputChange(index, 'url_code_setting.hospital_name', e.target.value)
-                                    }
-                                    disabled={!editState[customor.id]}
-                                />
-                            </td>
-                            <td>
-                                <input
-                                    type="text"
-                                    value={customor.url_code_setting?.advertising_company}
-                                    onChange={(e) =>
-                                        handleInputChange(index, 'url_code_setting.advertising_company', e.target.value)
-                                    }
-                                    disabled={!editState[customor.id]}
-                                />
-                            </td>
-                            <td>
-                                <input
-                                    type="text"
-                                    value={customor.url_code_setting?.ad_title}
-                                    onChange={(e) =>
-                                        handleInputChange(index, 'url_code_setting.ad_title', e.target.value)
-                                    }
-                                    disabled={!editState[customor.id]}
-                                />
-                            </td>
-                            <td>
-                                <input
-                                    type="text"
-                                    value={customor.url_code}
-                                    onChange={(e) => handleInputChange(index, 'url_code', e.target.value)}
-                                    disabled={!editState[customor.id]}
-                                />
-                            </td>
-                            <td>
-                                <input
-                                    type="text"
-                                    value={customor.name}
-                                    onChange={(e) => handleInputChange(index, 'name', e.target.value)}
-                                    disabled={!editState[customor.id]}
-                                />
-                            </td>
-                            <td>
-                                <input
-                                    type="text"
-                                    value={customor.phone}
-                                    onChange={(e) => handleInputChange(index, 'phone', e.target.value)}
-                                    disabled={!editState[customor.id]}
-                                />
-                            </td>
-                            <td>
-                                <input
-                                    type="text"
-                                    value={customor.created_at ? customor.created_at.split('T')[0] : ''}
-                                    onChange={(e) => handleInputChange(index, 'created_at', e.target.value)}
-                                    disabled={!editState[customor.id]}
-                                />
-                            </td>
-                            <td>
-                                {editState[customor.id] ? (
-                                    <button className="submit-button" onClick={() => handleSubmit(index)}>
-                                        저장하기
-                                    </button>
-                                ) : (
-                                    <button className="edit-button" onClick={() => handleEdit(customor.id)}>
-                                        수정하기
-                                    </button>
-                                )}
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-            <div className="pagination">
-                <button onClick={handlePrevPage} disabled={currentPage === 1}>
-                    이전
-                </button>
-                <span>
-                    {currentPage} / {totalPages}
-                </span>
-                <button onClick={handleNextPage} disabled={currentPage === totalPages}>
-                    다음
-                </button>
-            </div>
-            <style jsx>{`
+  const handleUpdateStatus = async () => {
+    const selectedIds = customors
+      .filter((customor) => customor.isSelected)
+      .map((customor) => customor.id);
+    if (selectedIds.length > 0) {
+      try {
+        const response = await axios.put(`/api/customor/update-status`, {
+          ids: selectedIds,
+          data_status: put_status,
+        });
+        console.log("Status updated successfully:", response.data);
+        alert("선택한 데이터가 삭제되었습니다.");
+        await fetchData();
+      } catch (error) {
+        console.error("Error updating status:", error);
+        alert("선택한 데이터가 삭제 중 오류가 발생했습니다.");
+      }
+    } else {
+      alert("삭제할 데이터를 선택하세요.");
+    }
+  };
+
+  return (
+    <div className="container">
+      <h2>{title}</h2>
+
+      {/* filters 상태와 handleFilterChange 함수를 FilterComponent에 전달 */}
+      <FilterComponent
+        filters={filters}
+        onFilterChange={handleFilterChange}
+        handleApplyFilters={handleApplyFilters}
+      />
+      <div className="recent-settings">
+        <h3>최근 설정</h3>
+        <div className="card-container">
+          {recentSettings &&
+            recentSettings.map((setting) => (
+              <div className="card" key={setting.id}>
+                <div className="card-title">{setting.ad_title}</div>
+                <div className="card-count">{setting.count}건</div>
+              </div>
+            ))}
+        </div>
+      </div>
+      <button onClick={handleUpdateStatus} className="delete-button">
+        {get_status === 1 ? "복원" : "삭제"}
+      </button>
+      {get_status === 1 && (
+        <button
+          onClick={() => handlePermanentDelete()}
+          className="permanent-delete"
+        >
+          영구삭제
+        </button>
+      )}
+      <table className="customor-table">
+        <thead>
+          <tr>
+            <th>선택</th>
+            <th>No</th>
+            <th>배당 여부</th>
+            <th>병원명</th>
+            <th>매체</th>
+            <th>광고 제목</th>
+            <th>코드</th>
+            <th>이름</th>
+            <th>전화번호</th>
+            <th>일자</th>
+            <th>수정</th>
+          </tr>
+        </thead>
+        <tbody>
+          {customors.map((customor, index) => (
+            <tr key={customor.id}>
+              <td>
+                <input
+                  type="checkbox"
+                  checked={customor.isSelected}
+                  onChange={() => handleCheckboxChange(index)}
+                />
+              </td>
+              <td>{customor.id}</td>
+              <td>
+                <input
+                  type="text"
+                  value={customor.dividend_status}
+                  onChange={(e) =>
+                    handleInputChange(index, "dividend_status", e.target.value)
+                  }
+                  disabled={!editState[customor.id]}
+                />
+              </td>
+              <td>
+                <input
+                  type="text"
+                  value={customor.url_code_setting?.hospital_name}
+                  onChange={(e) =>
+                    handleInputChange(
+                      index,
+                      "url_code_setting.hospital_name",
+                      e.target.value
+                    )
+                  }
+                  disabled={!editState[customor.id]}
+                />
+              </td>
+              <td>
+                <input
+                  type="text"
+                  value={customor.url_code_setting?.advertising_company}
+                  onChange={(e) =>
+                    handleInputChange(
+                      index,
+                      "url_code_setting.advertising_company",
+                      e.target.value
+                    )
+                  }
+                  disabled={!editState[customor.id]}
+                />
+              </td>
+              <td>
+                <input
+                  type="text"
+                  value={customor.url_code_setting?.ad_title}
+                  onChange={(e) =>
+                    handleInputChange(
+                      index,
+                      "url_code_setting.ad_title",
+                      e.target.value
+                    )
+                  }
+                  disabled={!editState[customor.id]}
+                />
+              </td>
+              <td>
+                <input
+                  type="text"
+                  value={customor.url_code}
+                  onChange={(e) =>
+                    handleInputChange(index, "url_code", e.target.value)
+                  }
+                  disabled={!editState[customor.id]}
+                />
+              </td>
+              <td>
+                <input
+                  type="text"
+                  value={customor.name}
+                  onChange={(e) =>
+                    handleInputChange(index, "name", e.target.value)
+                  }
+                  disabled={!editState[customor.id]}
+                />
+              </td>
+              <td>
+                <input
+                  type="text"
+                  value={customor.phone}
+                  onChange={(e) =>
+                    handleInputChange(index, "phone", e.target.value)
+                  }
+                  disabled={!editState[customor.id]}
+                />
+              </td>
+              <td>
+                <input
+                  type="text"
+                  value={
+                    customor.created_at ? customor.created_at.split("T")[0] : ""
+                  }
+                  onChange={(e) =>
+                    handleInputChange(index, "created_at", e.target.value)
+                  }
+                  disabled={!editState[customor.id]}
+                />
+              </td>
+              <td>
+                {editState[customor.id] ? (
+                  <button
+                    className="submit-button"
+                    onClick={() => handleSubmit(index)}
+                  >
+                    저장하기
+                  </button>
+                ) : (
+                  <button
+                    className="edit-button"
+                    onClick={() => handleEdit(customor.id)}
+                  >
+                    수정하기
+                  </button>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div className="pagination">
+        <button onClick={handlePrevPage} disabled={currentPage === 1}>
+          이전
+        </button>
+        <span>
+          {currentPage} / {totalPages}
+        </span>
+        <button onClick={handleNextPage} disabled={currentPage === totalPages}>
+          다음
+        </button>
+      </div>
+      <style jsx>{`
         /* 기존 스타일 그대로 유지 */
         .container {
           padding: 20px;
@@ -359,9 +417,48 @@ function CustomorDataPage({ title, get_status, put_status }) {
           margin: 0 5px;
           padding: 5px 10px;
         }
+        {/* 카드쪽  */}
+        .recent-settings {
+          margin-bottom: 20px;
+          text-align: center;
+        }
+        .card-container {
+          display: flex;
+          justify-content: space-between;
+          flex-wrap: wrap;
+          gap: 20px;
+        }
+
+        .card {
+          background-color: #f8f9fa;
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          padding: 20px;
+          width: calc(20% - 20px); /* 20% 너비에서 간격을 고려 */
+          box-sizing: border-box;
+          transition: transform 0.3s ease;
+          text-align: center;
+        }
+
+        .card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-title {
+          font-size: 1.2rem;
+          font-weight: bold;
+          margin-bottom: 10px;
+        }
+
+        .card-count {
+          font-size: 1rem;
+          color: #007bff;
+        }
       `}</style>
-        </div>
-    );
+    </div>
+  );
 }
 
 export default CustomorDataPage;
