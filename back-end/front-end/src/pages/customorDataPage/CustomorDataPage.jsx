@@ -170,6 +170,7 @@ function CustomorDataPage({ title, get_status, put_status }) {
         onFilterChange={handleFilterChange}
         handleApplyFilters={handleApplyFilters}
       />
+      {/* 건 수 나오는 곳  */}
       <div className="recent-settings">
         <h3>최근 설정</h3>
         <div className="card-container">
@@ -182,6 +183,7 @@ function CustomorDataPage({ title, get_status, put_status }) {
             ))}
         </div>
       </div>
+      {/* 삭제 버튼  */}
       <button onClick={handleUpdateStatus} className="delete-button">
         {get_status === 1 ? "복원" : "삭제"}
       </button>
@@ -209,6 +211,7 @@ function CustomorDataPage({ title, get_status, put_status }) {
             <th>수정</th>
           </tr>
         </thead>
+        {/* 데이터 뿌려주는 부분 */}
         <tbody>
           {customors.map((customor, index) => (
             <tr key={customor.id}>
