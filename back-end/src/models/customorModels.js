@@ -64,7 +64,18 @@ const getFilteredCustomors = async (filters, offset = 0, limit = 10) => {
         dividend_status ? { dividend_status } : {},
         phone ? { phone } : {},
         url_code ? { url_code } : {},
-        date ? { created_at: new Date(date) } : {},
+        date
+          ? {
+              date: {
+                gte: new Date(date + "T00:00:00Z"), // 해당 날짜의 시작
+                lt: new Date(
+                  new Date(date + "T00:00:00Z").setDate(
+                    new Date(date + "T00:00:00Z").getDate() + 1
+                  )
+                ), // 다음 날의 시작
+              },
+            }
+          : {},
         name ? { name: { contains: name } } : {},
         {
           url_code_setting: {
@@ -127,7 +138,18 @@ const getTotalCustomorCount = async (filters) => {
         dividend_status ? { dividend_status } : {},
         phone ? { phone } : {},
         url_code ? { url_code } : {},
-        date ? { created_at: new Date(date) } : {},
+        date
+          ? {
+              date: {
+                gte: new Date(date + "T00:00:00Z"), // 날짜의 시작
+                lt: new Date(
+                  new Date(date + "T00:00:00Z").setDate(
+                    new Date(date + "T00:00:00Z").getDate() + 1
+                  )
+                ), // 다음 날의 시작
+              },
+            }
+          : {},
         name ? { name: { contains: name } } : {},
         {
           url_code_setting: {
