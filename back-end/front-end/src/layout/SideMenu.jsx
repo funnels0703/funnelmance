@@ -1,7 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
 function SideMenu() {
+  const [openIndexes, setOpenIndexes] = useState({});
+
+  const toggleSubMenu = (index) => {
+    setOpenIndexes((prevState) => ({
+      ...prevState,
+      [index]: !prevState[index],
+    }));
+  };
+
   const menuItems = [
     { title: "메인", path: "/" },
     { title: "디비리스트", path: "/db" },
@@ -44,8 +53,10 @@ function SideMenu() {
       <ul className="main_menu">
         {menuItems.map((item, index) => (
           <li key={index}>
-            <Link to={item.path}>{item.title}</Link>
-            {item.subMenu && (
+            <Link to={item.path} onClick={() => toggleSubMenu(index)}>
+              {item.title}
+            </Link>
+            {item.subMenu && openIndexes[index] && (
               <ul className="sub_menu">
                 {item.subMenu.map((subItem, subIndex) => (
                   <li key={subIndex}>
@@ -60,8 +71,9 @@ function SideMenu() {
 
       <style jsx>{`
         nav {
-          width: 200px;
-          height: calc(100vh - 60px);
+          min-width: 200px;
+          padding-top: 35px;
+          height: 100%;
           background: var(--primary-600, #003181);
           box-shadow: 3px 0px 5px 0px rgba(152, 152, 152, 0.1);
           ul {

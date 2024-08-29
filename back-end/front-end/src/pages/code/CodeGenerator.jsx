@@ -7,6 +7,7 @@ const CodeGenerator = () => {
     ad_title: "",
     ad_number: "",
     hospital_name: "",
+    hospital_procedure: "",
     advertising_company: "",
     url_code: "",
   });
@@ -92,13 +93,24 @@ const CodeGenerator = () => {
         />
       </div>
       <div className="input-group">
-        <label>광고 회사</label>
+        <label>이벤트명</label>
+        <input
+          type="text"
+          name="hospital_procedure"
+          value={formData.hospital_procedure}
+          onChange={handleChange}
+          placeholder="이벤트명"
+          required
+        />
+      </div>
+      <div className="input-group">
+        <label>매체</label>
         <input
           type="text"
           name="advertising_company"
           value={formData.advertising_company}
           onChange={handleChange}
-          placeholder="광고 회사"
+          placeholder="매체"
           required
         />
       </div>

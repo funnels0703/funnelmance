@@ -48,6 +48,7 @@ const getFilteredCustomors = async (filters, offset = 0, limit = 10) => {
   const {
     dividend_status,
     hospital_name,
+    hospital_procedure,
     advertising_company,
     ad_title,
     url_code,
@@ -56,6 +57,8 @@ const getFilteredCustomors = async (filters, offset = 0, limit = 10) => {
     date,
     data_status,
   } = filters;
+  // console.log("date", date);
+  // console.log("new date", new Date(date + "T00:00:00Z"));
 
   const queryOptions = {
     where: {
@@ -82,6 +85,9 @@ const getFilteredCustomors = async (filters, offset = 0, limit = 10) => {
             hospital_name: hospital_name
               ? { contains: hospital_name }
               : undefined,
+            hospital_procedure: hospital_procedure
+              ? { contains: hospital_procedure }
+              : undefined,
             advertising_company: advertising_company
               ? { contains: advertising_company }
               : undefined,
@@ -107,6 +113,7 @@ const getFilteredCustomors = async (filters, offset = 0, limit = 10) => {
       url_code_setting: {
         select: {
           hospital_name: true,
+          hospital_procedure: true,
           advertising_company: true,
           ad_title: true,
         },
@@ -118,6 +125,7 @@ const getFilteredCustomors = async (filters, offset = 0, limit = 10) => {
 
   return prisma.customor_db.findMany(queryOptions);
 };
+
 const getTotalCustomorCount = async (filters) => {
   const {
     dividend_status,

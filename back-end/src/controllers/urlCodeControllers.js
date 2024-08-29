@@ -9,8 +9,14 @@ const {
 } = require("../models/urlCodeModel");
 
 const createUrlCodeController = async (req, res) => {
-  const { ad_title, ad_number, hospital_name, advertising_company, url_code } =
-    req.body;
+  const {
+    ad_title,
+    ad_number,
+    hospital_name,
+    hospital_procedure,
+    advertising_company,
+    url_code,
+  } = req.body;
   user_id = 1;
 
   console.log(url_code);
@@ -26,6 +32,7 @@ const createUrlCodeController = async (req, res) => {
       ad_title,
       ad_number,
       hospital_name,
+      hospital_procedure,
       advertising_company,
       url_code,
       user_id,
