@@ -28,8 +28,8 @@ function FilterComponent({ filters, onFilterChange, handleApplyFilters }) {
         />
         <input
           type="text"
-          name="hospital_procedure"
-          value={filters.hospital_procedure}
+          name="event_name"
+          value={filters.event_name}
           onChange={handleChange}
           placeholder="이벤트명"
         />

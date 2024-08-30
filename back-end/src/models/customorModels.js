@@ -48,7 +48,7 @@ const getFilteredCustomors = async (filters, offset = 0, limit = 10) => {
   const {
     dividend_status,
     hospital_name,
-    hospital_procedure,
+    event_name,
     advertising_company,
     ad_title,
     url_code,
@@ -85,9 +85,7 @@ const getFilteredCustomors = async (filters, offset = 0, limit = 10) => {
             hospital_name: hospital_name
               ? { contains: hospital_name }
               : undefined,
-            hospital_procedure: hospital_procedure
-              ? { contains: hospital_procedure }
-              : undefined,
+            event_name: event_name ? { contains: event_name } : undefined,
             advertising_company: advertising_company
               ? { contains: advertising_company }
               : undefined,
@@ -113,7 +111,7 @@ const getFilteredCustomors = async (filters, offset = 0, limit = 10) => {
       url_code_setting: {
         select: {
           hospital_name: true,
-          hospital_procedure: true,
+          event_name: true,
           advertising_company: true,
           ad_title: true,
         },

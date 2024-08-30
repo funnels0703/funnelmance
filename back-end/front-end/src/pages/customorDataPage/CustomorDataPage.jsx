@@ -16,7 +16,7 @@ function CustomorDataPage({ title, get_status, put_status }) {
   const [filters, setFilters] = useState({
     dividend_status: "",
     hospital_name: "",
-    hospital_procedure: "",
+    event_name: "",
     advertising_company: "",
     ad_title: "",
     url_code: "",
@@ -277,11 +277,11 @@ function CustomorDataPage({ title, get_status, put_status }) {
                 <td>
                   <input
                     type="text"
-                    value={customor.url_code_setting?.hospital_procedure}
+                    value={customor.url_code_setting?.event_name}
                     onChange={(e) =>
                       handleInputChange(
                         index,
-                        "url_code_setting.hospital_procedure",
+                        "url_code_setting.event_name",
                         e.target.value
                       )
                     }

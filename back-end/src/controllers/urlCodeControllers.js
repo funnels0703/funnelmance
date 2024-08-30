@@ -13,7 +13,7 @@ const createUrlCodeController = async (req, res) => {
     ad_title,
     ad_number,
     hospital_name,
-    hospital_procedure,
+    event_name,
     advertising_company,
     url_code,
   } = req.body;
@@ -32,7 +32,7 @@ const createUrlCodeController = async (req, res) => {
       ad_title,
       ad_number,
       hospital_name,
-      hospital_procedure,
+      event_name,
       advertising_company,
       url_code,
       user_id,

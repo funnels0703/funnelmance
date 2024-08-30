@@ -7,42 +7,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model advertising_company {
+  id                                                                            Int                @id @default(autoincrement())
+  name                                                                          String             @db.VarChar(255)
+  status                                                                        String?            @db.VarChar(50)
+  url_code_setting_id                                                           Int?
+  url_code_setting                                                              url_code_setting?  @relation(fields: [url_code_setting_id], references: [id], map: "advertising_company_ibfk_1")
+  url_code_setting_url_code_setting_advertising_company_idToadvertising_company url_code_setting[] @relation("url_code_setting_advertising_company_idToadvertising_company")
+
+  @@index([url_code_setting_id], map: "url_code_setting_id")
+}
+
 model click {
   id       Int     @id @default(autoincrement())
   url_code String? @db.VarChar(255)
   ip       String? @db.VarChar(255)
 
   @@unique([url_code, ip], map: "url_code_ip")
-}
-
-model funnels_db {
-  id         Int       @id @default(autoincrement())
-  apply      String?   @db.VarChar(30)
-  region     String?   @db.VarChar(10)
-  name       String?   @db.VarChar(20)
-  phone      String?   @db.VarChar(20)
-  revenue    String?   @db.VarChar(20)
-  memo       String?   @db.Text
-  privacy    String?   @default("0") @db.VarChar(5)
-  created_at DateTime? @default(now()) @db.Timestamp(0)
-  service    String?   @db.VarChar(30)
-}
-
-model url_code_setting {
-  id                                                            Int           @id @default(autoincrement())
-  hospital_name                                                 String        @db.VarChar(255)
-  user_id                                                       Int
-  url_code                                                      String        @unique(map: "url_code_unique") @db.VarChar(255)
-  db_request_count                                              Int?          @default(0)
-  db_click_count                                                Int?          @default(0)
-  created_at                                                    DateTime?     @default(now()) @db.Timestamp(0)
-  updated_at                                                    DateTime?     @default(now()) @db.Timestamp(0)
-  ad_title                                                      String        @db.VarChar(255)
-  ad_number                                                     String        @db.VarChar(50)
-  advertising_company                                           String        @db.VarChar(25)
-  hospital_procedure                                            String?       @db.VarChar(255)
-  customor_db_customor_db_url_code_setting_idTourl_code_setting customor_db[] @relation("customor_db_url_code_setting_idTourl_code_setting")
-  customor_db                                                   customor_db[]
 }
 
 model customor_db {
@@ -61,11 +42,84 @@ model customor_db {
   data_status                                                        Int?              @default(0) @db.TinyInt
   url_code_setting_id                                                Int?
   url_code_setting_customor_db_url_code_setting_idTourl_code_setting url_code_setting? @relation("customor_db_url_code_setting_idTourl_code_setting", fields: [url_code_setting_id], references: [id], map: "fk_customor_url_code_setting")
-  url_code_setting                                                   url_code_setting? @relation(fields: [url_code], references: [url_code], onDelete: NoAction, onUpdate: NoAction, map: "fk_url_code")
+  url_code_setting_customor_db_url_codeTourl_code_setting            url_code_setting? @relation("customor_db_url_codeTourl_code_setting", fields: [url_code], references: [url_code], onDelete: NoAction, onUpdate: NoAction, map: "fk_url_code")
 
   @@unique([phone, url_code], map: "phone_url_code_unique")
-  @@index([url_code], map: "fk_url_code")
   @@index([url_code_setting_id], map: "fk_customor_url_code_setting")
+  @@index([url_code], map: "fk_url_code")
+}
+
+model event_name {
+  id                                                          Int                @id @default(autoincrement())
+  name                                                        String             @db.VarChar(255)
+  status                                                      String?            @db.VarChar(50)
+  url_code_setting_id                                         Int?
+  url_code_setting                                            url_code_setting?  @relation(fields: [url_code_setting_id], references: [id], map: "event_name_ibfk_1")
+  url_code_setting_url_code_setting_event_name_idToevent_name url_code_setting[] @relation("url_code_setting_event_name_idToevent_name")
+
+  @@index([url_code_setting_id], map: "url_code_setting_id")
+}
+
+model funnels_db {
+  id         Int       @id @default(autoincrement())
+  apply      String?   @db.VarChar(30)
+  region     String?   @db.VarChar(10)
+  name       String?   @db.VarChar(20)
+  phone      String?   @db.VarChar(20)
+  revenue    String?   @db.VarChar(20)
+  memo       String?   @db.Text
+  privacy    String?   @default("0") @db.VarChar(5)
+  created_at DateTime? @default(now()) @db.Timestamp(0)
+  service    String?   @db.VarChar(30)
+}
+
+model hospital_name {
+  id                                                                Int                @id @default(autoincrement())
+  name                                                              String             @db.VarChar(255)
+  status                                                            String?            @db.VarChar(50)
+  url_code_setting_id                                               Int?
+  url_code_setting                                                  url_code_setting?  @relation(fields: [url_code_setting_id], references: [id], map: "hospital_name_ibfk_1")
+  url_code_setting_url_code_setting_hospital_name_idTohospital_name url_code_setting[] @relation("url_code_setting_hospital_name_idTohospital_name")
+
+  @@index([url_code_setting_id], map: "url_code_setting_id")
+}
+
+model url_code_setting {
+  id                                                                               Int                   @id @default(autoincrement())
+  user_id                                                                          Int
+  url_code                                                                         String                @unique(map: "url_code_unique") @db.VarChar(255)
+  db_request_count                                                                 Int?                  @default(0)
+  db_click_count                                                                   Int?                  @default(0)
+  created_at                                                                       DateTime?             @default(now()) @db.Timestamp(0)
+  updated_at                                                                       DateTime?             @default(now()) @db.Timestamp(0)
+  ad_title                                                                         String                @db.VarChar(255)
+  ad_number                                                                        String                @db.VarChar(50)
+  event_name_id                                                                    Int?
+  hospital_name_id                                                                 Int?
+  advertising_company_id                                                           Int?
+  advertising_company                                                              advertising_company[]
+  customor_db_customor_db_url_code_setting_idTourl_code_setting                    customor_db[]         @relation("customor_db_url_code_setting_idTourl_code_setting")
+  customor_db_customor_db_url_codeTourl_code_setting                               customor_db[]         @relation("customor_db_url_codeTourl_code_setting")
+  event_name                                                                       event_name[]
+  hospital_name                                                                    hospital_name[]
+  advertising_company_url_code_setting_advertising_company_idToadvertising_company advertising_company?  @relation("url_code_setting_advertising_company_idToadvertising_company", fields: [advertising_company_id], references: [id], map: "fk_url_code_setting_advertising_company")
+  event_name_url_code_setting_event_name_idToevent_name                            event_name?           @relation("url_code_setting_event_name_idToevent_name", fields: [event_name_id], references: [id], map: "fk_url_code_setting_event_name")
+  hospital_name_url_code_setting_hospital_name_idTohospital_name                   hospital_name?        @relation("url_code_setting_hospital_name_idTohospital_name", fields: [hospital_name_id], references: [id], map: "fk_url_code_setting_hospital_name")
+  user                                                                             user[]
+
+  @@index([advertising_company_id], map: "fk_url_code_setting_advertising_company")
+  @@index([event_name_id], map: "fk_url_code_setting_event_name")
+  @@index([hospital_name_id], map: "fk_url_code_setting_hospital_name")
+}
+
+model user {
+  id                  Int               @id @default(autoincrement())
+  name                String            @db.VarChar(255)
+  status              String?           @db.VarChar(50)
+  url_code_setting_id Int?
+  url_code_setting    url_code_setting? @relation(fields: [url_code_setting_id], references: [id], map: "user_ibfk_1")
+
+  @@index([url_code_setting_id], map: "url_code_setting_id")
 }
 
 model user_settings {

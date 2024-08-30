@@ -7,6 +7,7 @@ import CodePage from "./pages/code/CodePage.jsx";
 import CustomorDataPage from "./pages/customorDataPage/CustomorDataPage.jsx";
 
 import Layout from "./layout/Layout.jsx";
+import TabComponent from "./pages/admin/listsetting/TabComponent.jsx";
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
                 />
               }
             />
+            <Route path="/admin/listsetting" element={<TabComponent />} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>

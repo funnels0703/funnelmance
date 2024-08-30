@@ -41,7 +41,7 @@ function SideMenu() {
       title: "관리자 페이지",
       path: "/admin",
       subMenu: [
-        { title: "병원/이벤트/매체 리스트", path: "/" },
+        { title: "병원/이벤트/매체 리스트", path: "/admin/listsetting" },
         { title: "지점별 이벤트", path: "/" },
       ],
     },

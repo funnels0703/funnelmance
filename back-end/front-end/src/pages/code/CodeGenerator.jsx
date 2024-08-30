@@ -7,7 +7,7 @@ const CodeGenerator = () => {
     ad_title: "",
     ad_number: "",
     hospital_name: "",
-    hospital_procedure: "",
+    event_name: "",
     advertising_company: "",
     url_code: "",
   });
@@ -96,8 +96,8 @@ const CodeGenerator = () => {
         <label>이벤트명</label>
         <input
           type="text"
-          name="hospital_procedure"
-          value={formData.hospital_procedure}
+          name="event_name"
+          value={formData.event_name}
           onChange={handleChange}
           placeholder="이벤트명"
           required
