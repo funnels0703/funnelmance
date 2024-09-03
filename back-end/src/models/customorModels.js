@@ -57,8 +57,6 @@ const getFilteredCustomors = async (filters, offset = 0, limit = 10) => {
     date,
     data_status,
   } = filters;
-  // console.log("date", date);
-  // console.log("new date", new Date(date + "T00:00:00Z"));
 
   const queryOptions = {
     where: {
@@ -70,28 +68,16 @@ const getFilteredCustomors = async (filters, offset = 0, limit = 10) => {
         date
           ? {
               date: {
-                gte: new Date(date + "T00:00:00Z"), // 해당 날짜의 시작
+                gte: new Date(date + "T00:00:00Z"),
                 lt: new Date(
                   new Date(date + "T00:00:00Z").setDate(
                     new Date(date + "T00:00:00Z").getDate() + 1
                   )
-                ), // 다음 날의 시작
+                ),
               },
             }
           : {},
         name ? { name: { contains: name } } : {},
-        {
-          url_code_setting: {
-            hospital_name: hospital_name
-              ? { contains: hospital_name }
-              : undefined,
-            event_name: event_name ? { contains: event_name } : undefined,
-            advertising_company: advertising_company
-              ? { contains: advertising_company }
-              : undefined,
-            ad_title: ad_title ? { contains: ad_title } : undefined,
-          },
-        },
       ],
     },
     select: {
@@ -108,7 +94,8 @@ const getFilteredCustomors = async (filters, offset = 0, limit = 10) => {
       url_code: true,
       created_at: true,
       data_status: true,
-      url_code_setting: {
+      // 관계를 참조할 때는 해당하는 관계 이름을 정확히 사용해야 합니다.
+      url_code_setting_customor_db_url_code_setting_idTourl_code_setting: {
         select: {
           hospital_name: true,
           event_name: true,
@@ -137,6 +124,22 @@ const getTotalCustomorCount = async (filters) => {
     data_status,
   } = filters;
 
+  // `url_code_setting`에 관련된 필터 조건을 먼저 적용하여 해당하는 ID를 찾습니다.
+  const urlCodeSettingIds = await prisma.url_code_setting
+    .findMany({
+      where: {
+        AND: [
+          hospital_name ? { hospital_name: { contains: hospital_name } } : {},
+          advertising_company
+            ? { advertising_company: { contains: advertising_company } }
+            : {},
+          ad_title ? { ad_title: { contains: ad_title } } : {},
+        ],
+      },
+      select: { id: true },
+    })
+    .then((settings) => settings.map((s) => s.id));
+
   const countOptions = {
     where: {
       AND: [
@@ -147,33 +150,26 @@ const getTotalCustomorCount = async (filters) => {
         date
           ? {
               date: {
-                gte: new Date(date + "T00:00:00Z"), // 날짜의 시작
+                gte: new Date(date + "T00:00:00Z"),
                 lt: new Date(
                   new Date(date + "T00:00:00Z").setDate(
                     new Date(date + "T00:00:00Z").getDate() + 1
                   )
-                ), // 다음 날의 시작
+                ),
               },
             }
           : {},
         name ? { name: { contains: name } } : {},
-        {
-          url_code_setting: {
-            hospital_name: hospital_name
-              ? { contains: hospital_name }
-              : undefined,
-            advertising_company: advertising_company
-              ? { contains: advertising_company }
-              : undefined,
-            ad_title: ad_title ? { contains: ad_title } : undefined,
-          },
-        },
+        urlCodeSettingIds.length > 0
+          ? { url_code_setting_id: { in: urlCodeSettingIds } }
+          : {},
       ],
     },
   };
 
   return prisma.customor_db.count(countOptions);
 };
+
 // 특정 ID의 customor 데이터 가져오기 (GET by ID)
 const getCustomorById = async (id) => {
   return prisma.customor_db.findUnique({
