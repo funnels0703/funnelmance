@@ -1,104 +1,59 @@
+// src/models/userModel.js
 const { PrismaClient } = require("@prisma/client");
+const bcrypt = require("bcrypt");
+
 const prisma = new PrismaClient();
 
-// 모든 사용자 정보 조회
+const createUser = async (userData) => {
+  const {
+    username,
+    password,
+    name,
+    role = "USER",
+    is_active = true,
+  } = userData;
+
+  // 비밀번호 해시화
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  // 유저 생성
+  return await prisma.user.create({
+    data: {
+      username,
+      password: hashedPassword,
+      name,
+      role,
+      is_active,
+    },
+  });
+};
+
 const getAllUsers = async () => {
-  try {
-    return await prisma.users.findMany();
-  } catch (error) {
-    console.error("Error fetching users:", error);
-    throw error;
-  }
+  return await prisma.user.findMany({
+    select: {
+      user_id: true,
+      username: true,
+      name: true,
+      role: true,
+      is_active: true,
+      created_at: true,
+      updated_at: true,
+    },
+  });
 };
 
-// 특정 사용자 조회
-const getUserById = async (userId) => {
-  try {
-    return await prisma.users.findUnique({
-      where: { userID: userId },
-    });
-  } catch (error) {
-    console.error("Error fetching user:", error);
-    throw error;
-  }
+const updateUser = async (user_id, data) => {
+  return prisma.user.update({
+    where: { user_id: parseInt(user_id) },
+    data: {
+      name: data.name,
+      role: data.role,
+      is_active: Boolean(data.is_active),
+    },
+  });
 };
-
-// 사용자 추가
-const addUser = async (userData) => {
-  try {
-    return await prisma.users.create({
-      data: userData,
-    });
-  } catch (error) {
-    console.error("Error adding user:", error);
-    throw error;
-  }
-};
-
-// 사용자 업데이트
-const updateUser = async (userId, updatedData) => {
-  try {
-    return await prisma.users.update({
-      where: { userID: userId },
-      data: updatedData,
-    });
-  } catch (error) {
-    console.error("Error updating user:", error);
-    throw error;
-  }
-};
-
-// 사용자 삭제
-const deleteUser = async (userId) => {
-  try {
-    return await prisma.users.delete({
-      where: { userID: userId },
-    });
-  } catch (error) {
-    console.error("Error deleting user:", error);
-    throw error;
-  }
-};
-
-// 이메일 조회
-const getUserByEmail = async (email) => {
-  try {
-    return await prisma.users.findUnique({
-      where: { email: email },
-    });
-  } catch (error) {
-    console.error("Error fetching user by email:", error);
-    throw error;
-  }
-};
-
-// 특정 사용자와 관련된 알림이 있는 게시글 조회
-const getNotifiedPostsByUserId = async (userId) => {
-  try {
-    return await prisma.post.findMany({
-      where: {
-        userID: userId,
-        isNotified: true,
-      },
-      select: {
-        postID: true,
-        patientName: true,
-        state: true,
-        updatedAt: true,
-      },
-    });
-  } catch (error) {
-    console.error("Error fetching notified posts:", error);
-    throw error;
-  }
-};
-
 module.exports = {
+  createUser,
   getAllUsers,
-  getUserById,
-  addUser,
   updateUser,
-  deleteUser,
-  getUserByEmail,
-  getNotifiedPostsByUserId,
 };

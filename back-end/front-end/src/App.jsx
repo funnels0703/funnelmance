@@ -8,6 +8,7 @@ import CustomorDataPage from "./pages/customorDataPage/CustomorDataPage.jsx";
 
 import Layout from "./layout/Layout.jsx";
 import TabComponent from "./pages/admin/listsetting/TabComponent.jsx";
+import UserManagement from "./pages/admin/user/UserManagement.jsx";
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
               }
             />
             <Route path="/admin/listsetting" element={<TabComponent />} />
+            <Route path="/admin/UserManagement" element={<UserManagement />} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>
