@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import FilterComponent from './FilterComponent';
 import AccordionComponent from './AccordionComponent';
+import StatCard from './StatCard';
+import DeleteButton from './DeleteButton';
 
 function CustomorDataPage({ title, get_status, put_status }) {
     const [customors, setCustomors] = useState([]);
@@ -172,47 +174,24 @@ function CustomorDataPage({ title, get_status, put_status }) {
                 handleApplyFilters={handleApplyFilters}
             />
 
-            {/* 매체 필터 버튼들 */}
-            <div className="media-buttons">
-                <button onClick={() => handleMediaFilter('토스')}>토스</button>
-                <button onClick={() => handleMediaFilter('당근')}>당근</button>
-                <button onClick={() => handleMediaFilter('카카오')}>카카오</button>
-            </div>
-
             {/* 최근 설정 카드 */}
-            <div className="recent-settings">
-                <div className="recent-settings-info">
-                    <div className="stat-card">
-                        <div className="stat-value">{recentSettings.length}</div>
-                        <div className="stat-label">DB 전체</div>
-                    </div>
-                    <div className="stat-card">
-                        <div className="stat-value">100</div>
-                        <div className="stat-label">당근마켓</div>
-                    </div>
-                    <div className="stat-card">
-                        <div className="stat-value">15</div>
-                        <div className="stat-label">GDN</div>
-                    </div>
-                    <div className="stat-card">
-                        <div className="stat-value">6</div>
-                        <div className="stat-label">토스</div>
-                    </div>
-                    <div className="stat-card">
-                        <div className="stat-value">2</div>
-                        <div className="stat-label">틱톡</div>
-                    </div>
+            <div className="itdependson">
+                <div className="userSetCompany cardMarginAdded">
+                    <StatCard label="DB 전체" value="139" />
                 </div>
-                <div className="recent-settings">
-                    <AccordionComponent recentSettings={recentSettings} />
+                <div className="userSetCompany cardAllSet">
+                    <StatCard label="당근" value="100" />
+                    <StatCard label="GDN" value="9" />
+                    <StatCard label="토스" value="6" />
+                    <StatCard label="틱톡" value="2" />
                 </div>
             </div>
-
+            <div className="recent-settings">
+                <AccordionComponent recentSettings={recentSettings} />
+            </div>
             {/* 삭제 버튼 */}
             <div className="button-group">
-                <button onClick={handleUpdateStatus} className="delete-button">
-                    {get_status === 1 ? '복원' : '삭제'}
-                </button>
+                <DeleteButton handleUpdateStatus={handleUpdateStatus} />
                 {get_status === 1 && (
                     <button onClick={() => handlePermanentDelete()} className="permanent-delete">
                         영구삭제
@@ -355,158 +334,152 @@ function CustomorDataPage({ title, get_status, put_status }) {
                     padding: 20px;
                     max-width: 100%;
                     overflow-x: auto;
-                }
+                    .itdependson {
+                        display: flex;
+                        flex-direction: row;
+                    }
+                    .userSetCompany {
+                        display: flex;
+                        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+                        flex-direction: row;
+                    }
+                    .cardMarginAdded {
+                        margin-right: 19px;
+                        width: 283px;
+                        height: 200px;
+                        background-color: #fff;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        border-top: 8px solid #4880ff; /* 상단 파란색 보더 */
+                        padding: 10px;
+                        box-sizing: border-box;
+                    }
+                    .cardAllSet {
+                        width: 1242px;
+                        height: 200px;
+                        background-color: #fff;
+                        display: flex;
+                        align-items: center;
+                        justify-content: start;
+                        border-top: 8px solid #4880ff; /* 상단 파란색 보더 */
+                        padding: 10px 10px 10px 30px;
+                        box-sizing: border-box;
+                        .stat-card {
+                            width: 200px;
+                        }
+                    }
+                    h2 {
+                        margin-bottom: 20px;
+                        text-align: center;
+                    }
 
-                h2 {
-                    margin-bottom: 20px;
-                    text-align: center;
-                }
+                    .permanent-delete {
+                        margin-left: 10px;
+                        padding: 10px 15px;
+                        background-color: #6c757d;
+                        color: white;
+                        border: none;
+                        cursor: pointer;
+                    }
 
-                .delete-button {
-                    padding: 10px 15px;
-                    background-color: #dc3545;
-                    color: white;
-                    border: none;
-                    cursor: pointer;
-                }
+                    .permanent-delete:hover {
+                        background-color: #5a6268;
+                    }
 
-                .delete-button:hover {
-                    background-color: #c82333;
-                }
+                    .customor-table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-top: 20px;
+                    }
 
-                .permanent-delete {
-                    margin-left: 10px;
-                    padding: 10px 15px;
-                    background-color: #6c757d;
-                    color: white;
-                    border: none;
-                    cursor: pointer;
-                }
+                    th,
+                    td {
+                        border: 1px solid #ccc;
+                        padding: 10px;
+                        text-align: left;
+                    }
 
-                .permanent-delete:hover {
-                    background-color: #5a6268;
-                }
+                    th {
+                        background-color: #f8f9fa;
+                    }
 
-                .customor-table {
-                    width: 100%;
-                    border-collapse: collapse;
-                    margin-top: 20px;
-                }
+                    .submit-button,
+                    .edit-button {
+                        padding: 5px 10px;
+                        background-color: #007bff;
+                        color: white;
+                        border: none;
+                        cursor: pointer;
+                    }
 
-                th,
-                td {
-                    border: 1px solid #ccc;
-                    padding: 10px;
-                    text-align: left;
-                }
+                    .submit-button:hover,
+                    .edit-button:hover {
+                        background-color: #0056b3;
+                    }
 
-                th {
-                    background-color: #f8f9fa;
-                }
+                    input {
+                        width: 100%;
+                        padding: 5px;
+                        box-sizing: border-box;
+                    }
 
-                .submit-button,
-                .edit-button {
-                    padding: 5px 10px;
-                    background-color: #007bff;
-                    color: white;
-                    border: none;
-                    cursor: pointer;
-                }
+                    input:disabled {
+                        background-color: #f5f5f5;
+                        border: 1px solid #ddd;
+                    }
 
-                .submit-button:hover,
-                .edit-button:hover {
-                    background-color: #0056b3;
-                }
+                    .pagination {
+                        display: flex;
+                        justify-content: center;
+                        margin: 20px 0;
+                    }
 
-                input {
-                    width: 100%;
-                    padding: 5px;
-                    box-sizing: border-box;
-                }
+                    .pagination button {
+                        margin: 0 5px;
+                        padding: 5px 10px;
+                        background-color: #007bff;
+                        color: white;
+                        border: none;
+                        cursor: pointer;
+                    }
 
-                input:disabled {
-                    background-color: #f5f5f5;
-                    border: 1px solid #ddd;
-                }
+                    .pagination button:disabled {
+                        background-color: #ddd;
+                        cursor: not-allowed;
+                    }
 
-                .pagination {
-                    display: flex;
-                    justify-content: center;
-                    margin: 20px 0;
-                }
+                    .media-buttons {
+                        margin-bottom: 20px;
+                        text-align: center;
+                    }
 
-                .pagination button {
-                    margin: 0 5px;
-                    padding: 5px 10px;
-                    background-color: #007bff;
-                    color: white;
-                    border: none;
-                    cursor: pointer;
-                }
+                    .media-buttons button {
+                        margin: 0 10px;
+                        padding: 10px 20px;
+                        background-color: #007bff;
+                        color: white;
+                        border: none;
+                        border-radius: 5px;
+                        cursor: pointer;
+                        transition: background-color 0.3s;
+                    }
 
-                .pagination button:disabled {
-                    background-color: #ddd;
-                    cursor: not-allowed;
-                }
+                    .media-buttons button:hover {
+                        background-color: #0056b3;
+                    }
 
-                .media-buttons {
-                    margin-bottom: 20px;
-                    text-align: center;
-                }
+                    .card-container {
+                        display: flex;
+                        justify-content: space-between;
+                        flex-wrap: wrap;
+                        gap: 20px;
+                    }
 
-                .media-buttons button {
-                    margin: 0 10px;
-                    padding: 10px 20px;
-                    background-color: #007bff;
-                    color: white;
-                    border: none;
-                    border-radius: 5px;
-                    cursor: pointer;
-                    transition: background-color 0.3s;
-                }
-
-                .media-buttons button:hover {
-                    background-color: #0056b3;
-                }
-
-                .recent-settings-info {
-                    display: flex;
-                    justify-content: space-between;
-                    margin-bottom: 20px;
-                    padding: 10px;
-                    background-color: #f8f9fa;
-                    border-radius: 8px;
-                }
-
-                .stat-card {
-                    text-align: center;
-                    background-color: #007bff;
-                    color: white;
-                    padding: 20px;
-                    border-radius: 8px;
-                    width: 100%;
-                    margin: 0 10px;
-                }
-
-                .stat-value {
-                    font-size: 2rem;
-                    font-weight: bold;
-                }
-
-                .stat-label {
-                    margin-top: 10px;
-                }
-
-                .card-container {
-                    display: flex;
-                    justify-content: space-between;
-                    flex-wrap: wrap;
-                    gap: 20px;
-                }
-
-                .button-group {
-                    margin: 20px 0;
-                    text-align: center;
+                    .button-group {
+                        margin: 20px 0;
+                        text-align: center;
+                    }
                 }
             `}</style>
         </div>
