@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import FilterComponent from './FilterComponent';
+import AccordionComponent from './AccordionComponent';
 
 function CustomorDataPage({ title, get_status, put_status }) {
     const [customors, setCustomors] = useState([]);
@@ -24,6 +25,7 @@ function CustomorDataPage({ title, get_status, put_status }) {
         phone: '',
         date: '',
     });
+
     const handleNextPage = () => {
         if (currentPage < totalPages) {
             setCurrentPage((prevPage) => prevPage + 1);
@@ -35,6 +37,7 @@ function CustomorDataPage({ title, get_status, put_status }) {
             setCurrentPage((prevPage) => prevPage - 1);
         }
     };
+
     useEffect(() => {
         fetchData(filters); // currentPage가 변경될 때마다 데이터 가져오기
     }, [currentPage]);
@@ -168,34 +171,55 @@ function CustomorDataPage({ title, get_status, put_status }) {
                 onFilterChange={handleFilterChange}
                 handleApplyFilters={handleApplyFilters}
             />
+
             {/* 매체 필터 버튼들 */}
             <div className="media-buttons">
                 <button onClick={() => handleMediaFilter('토스')}>토스</button>
                 <button onClick={() => handleMediaFilter('당근')}>당근</button>
                 <button onClick={() => handleMediaFilter('카카오')}>카카오</button>
             </div>
-            {/* 건 수 나오는 곳  */}
+
+            {/* 최근 설정 카드 */}
             <div className="recent-settings">
-                <h3>최근 설정</h3>
-                <div className="card-container">
-                    {recentSettings &&
-                        recentSettings.map((setting) => (
-                            <div className="card" key={setting.id}>
-                                <div className="card-title">{setting.ad_title}</div>
-                                <div className="card-count">{setting.count}건</div>
-                            </div>
-                        ))}
+                <div className="recent-settings-info">
+                    <div className="stat-card">
+                        <div className="stat-value">{recentSettings.length}</div>
+                        <div className="stat-label">DB 전체</div>
+                    </div>
+                    <div className="stat-card">
+                        <div className="stat-value">100</div>
+                        <div className="stat-label">당근마켓</div>
+                    </div>
+                    <div className="stat-card">
+                        <div className="stat-value">15</div>
+                        <div className="stat-label">GDN</div>
+                    </div>
+                    <div className="stat-card">
+                        <div className="stat-value">6</div>
+                        <div className="stat-label">토스</div>
+                    </div>
+                    <div className="stat-card">
+                        <div className="stat-value">2</div>
+                        <div className="stat-label">틱톡</div>
+                    </div>
+                </div>
+                <div className="recent-settings">
+                    <AccordionComponent recentSettings={recentSettings} />
                 </div>
             </div>
-            {/* 삭제 버튼  */}
-            <button onClick={handleUpdateStatus} className="delete-button">
-                {get_status === 1 ? '복원' : '삭제'}
-            </button>
-            {get_status === 1 && (
-                <button onClick={() => handlePermanentDelete()} className="permanent-delete">
-                    영구삭제
+
+            {/* 삭제 버튼 */}
+            <div className="button-group">
+                <button onClick={handleUpdateStatus} className="delete-button">
+                    {get_status === 1 ? '복원' : '삭제'}
                 </button>
-            )}
+                {get_status === 1 && (
+                    <button onClick={() => handlePermanentDelete()} className="permanent-delete">
+                        영구삭제
+                    </button>
+                )}
+            </div>
+
             <table className="customor-table">
                 <thead>
                     <tr>
@@ -203,10 +227,9 @@ function CustomorDataPage({ title, get_status, put_status }) {
                         <th>No</th>
                         <th>배당 여부</th>
                         <th>병원명</th>
-                        <th>이벤트명</th>
                         <th>매체</th>
                         <th>광고 제목</th>
-                        <th>코드</th>
+                        <th>이벤트명</th>
                         <th>이름</th>
                         <th>전화번호</th>
                         <th>일자</th>
@@ -243,9 +266,17 @@ function CustomorDataPage({ title, get_status, put_status }) {
                                 <td>
                                     <input
                                         type="text"
-                                        value={customor.url_code_setting?.hospital_name}
+                                        value={customor.hospital_name}
+                                        onChange={(e) => handleInputChange(index, 'hospital_name', e.target.value)}
+                                        disabled={!editState[customor.id]}
+                                    />
+                                </td>
+                                <td>
+                                    <input
+                                        type="text"
+                                        value={customor.advertising_company}
                                         onChange={(e) =>
-                                            handleInputChange(index, 'url_code_setting.hospital_name', e.target.value)
+                                            handleInputChange(index, 'advertising_company', e.target.value)
                                         }
                                         disabled={!editState[customor.id]}
                                     />
@@ -253,45 +284,20 @@ function CustomorDataPage({ title, get_status, put_status }) {
                                 <td>
                                     <input
                                         type="text"
-                                        value={customor.url_code_setting?.event_name}
-                                        onChange={(e) =>
-                                            handleInputChange(index, 'url_code_setting.event_name', e.target.value)
-                                        }
+                                        value={customor.ad_title}
+                                        onChange={(e) => handleInputChange(index, 'ad_title', e.target.value)}
                                         disabled={!editState[customor.id]}
                                     />
                                 </td>
                                 <td>
                                     <input
                                         type="text"
-                                        value={customor.url_code_setting?.advertising_company}
-                                        onChange={(e) =>
-                                            handleInputChange(
-                                                index,
-                                                'url_code_setting.advertising_company',
-                                                e.target.value
-                                            )
-                                        }
+                                        value={customor.event_name}
+                                        onChange={(e) => handleInputChange(index, 'event_name', e.target.value)}
                                         disabled={!editState[customor.id]}
                                     />
                                 </td>
-                                <td>
-                                    <input
-                                        type="text"
-                                        value={customor.url_code_setting?.ad_title}
-                                        onChange={(e) =>
-                                            handleInputChange(index, 'url_code_setting.ad_title', e.target.value)
-                                        }
-                                        disabled={!editState[customor.id]}
-                                    />
-                                </td>
-                                <td>
-                                    <input
-                                        type="text"
-                                        value={customor.url_code}
-                                        onChange={(e) => handleInputChange(index, 'url_code', e.target.value)}
-                                        disabled={!editState[customor.id]}
-                                    />
-                                </td>
+
                                 <td>
                                     <input
                                         type="text"
@@ -303,7 +309,7 @@ function CustomorDataPage({ title, get_status, put_status }) {
                                 <td>
                                     <input
                                         type="text"
-                                        value={customor.phone}
+                                        value={customor.phone ? customor.phone.split('T')[0] : ''}
                                         onChange={(e) => handleInputChange(index, 'phone', e.target.value)}
                                         disabled={!editState[customor.id]}
                                     />
@@ -343,137 +349,166 @@ function CustomorDataPage({ title, get_status, put_status }) {
                     다음
                 </button>
             </div>
+
             <style jsx>{`
-        /* 기존 스타일 그대로 유지 */
-        .container {
-          padding: 20px;
-          max-width: 100%;
-          overflow-x: auto;
-        }
+                .container {
+                    padding: 20px;
+                    max-width: 100%;
+                    overflow-x: auto;
+                }
 
-        h2 {
-          margin-bottom: 20px;
-          text-align: center;
-        }
+                h2 {
+                    margin-bottom: 20px;
+                    text-align: center;
+                }
 
-        .delete-button {
-          margin-bottom: 10px;
-          padding: 10px 15px;
-          background-color: #dc3545;
-          color: white;
-          border: none;
-          cursor: pointer;
-        }
-        
-        .delete-button:hover {
-          background-color: #c82333;
-        }
+                .delete-button {
+                    padding: 10px 15px;
+                    background-color: #dc3545;
+                    color: white;
+                    border: none;
+                    cursor: pointer;
+                }
 
-        .customor-table {
-          width: 100%;
-          border-collapse: collapse;
-        }
+                .delete-button:hover {
+                    background-color: #c82333;
+                }
 
-        th, td {
-          border: 1px solid #ccc;
-          padding: 10px;
-          text-align left;
-        }
+                .permanent-delete {
+                    margin-left: 10px;
+                    padding: 10px 15px;
+                    background-color: #6c757d;
+                    color: white;
+                    border: none;
+                    cursor: pointer;
+                }
 
-        th {
-          background-color: #eee;
-        }
+                .permanent-delete:hover {
+                    background-color: #5a6268;
+                }
 
-        .submit-button, .edit-button {
-          padding: 5px 10px;
-          background-color: #007bff;
-          color: white;
-          border: none;
-          cursor: pointer;
-        }
+                .customor-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 20px;
+                }
 
-        .submit-button:hover, .edit-button:hover {
-          background-color: #0056b3;
-        }
-        input {
-          width: 100%;
-          padding: 5px;
-          box-sizing: border-box;
-        }
+                th,
+                td {
+                    border: 1px solid #ccc;
+                    padding: 10px;
+                    text-align: left;
+                }
 
-        input:disabled {
-          background-color: #f5f5f5;
-          border: 1px solid #ddd;
-        }
-        .pagination {
-          display: flex;  
-          justify-content: center;
-            margin: 20px 0;
-        }
-        .pagination button {
-          margin: 0 5px;
-          padding: 5px 10px;
-        }
-        {/* 버튼  */}
-        .media-buttons {
-          margin-bottom: 20px;
-          text-align: center;
-        }
+                th {
+                    background-color: #f8f9fa;
+                }
 
-        .media-buttons button {
-          margin: 0 10px;
-          padding: 10px 20px;
-          background-color: #007bff;
-          color: white;
-          border: none;
-          border-radius: 5px;
-          cursor: pointer;
-          transition: background-color 0.3s;
-        }
+                .submit-button,
+                .edit-button {
+                    padding: 5px 10px;
+                    background-color: #007bff;
+                    color: white;
+                    border: none;
+                    cursor: pointer;
+                }
 
-        .media-buttons button:hover {
-          background-color: #0056b3;
-        }
-        {/* 카드쪽  */}
-        .recent-settings {
-          margin-bottom: 20px;
-          text-align: center;
-        }
-        .card-container {
-          display: flex;
-          justify-content: space-between;
-          flex-wrap: wrap;
-          gap: 20px;
-        }
+                .submit-button:hover,
+                .edit-button:hover {
+                    background-color: #0056b3;
+                }
 
-        .card {
-          background-color: #f8f9fa;
-          border: 1px solid #ddd;
-          border-radius: 8px;
-          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-          padding: 20px;
-          width: calc(20% - 20px); /* 20% 너비에서 간격을 고려 */
-          box-sizing: border-box;
-          transition: transform 0.3s ease;
-          text-align: center;
-        }
+                input {
+                    width: 100%;
+                    padding: 5px;
+                    box-sizing: border-box;
+                }
 
-        .card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
-        }
+                input:disabled {
+                    background-color: #f5f5f5;
+                    border: 1px solid #ddd;
+                }
 
-        .card-title {
-          font-size: 1.2rem;
-          font-weight: bold;
-          margin-bottom: 10px;
-        }
+                .pagination {
+                    display: flex;
+                    justify-content: center;
+                    margin: 20px 0;
+                }
 
-        .card-count {
-          font-size: 1rem;
-          color: #007bff;
-        }
-      `}</style>
+                .pagination button {
+                    margin: 0 5px;
+                    padding: 5px 10px;
+                    background-color: #007bff;
+                    color: white;
+                    border: none;
+                    cursor: pointer;
+                }
+
+                .pagination button:disabled {
+                    background-color: #ddd;
+                    cursor: not-allowed;
+                }
+
+                .media-buttons {
+                    margin-bottom: 20px;
+                    text-align: center;
+                }
+
+                .media-buttons button {
+                    margin: 0 10px;
+                    padding: 10px 20px;
+                    background-color: #007bff;
+                    color: white;
+                    border: none;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    transition: background-color 0.3s;
+                }
+
+                .media-buttons button:hover {
+                    background-color: #0056b3;
+                }
+
+                .recent-settings-info {
+                    display: flex;
+                    justify-content: space-between;
+                    margin-bottom: 20px;
+                    padding: 10px;
+                    background-color: #f8f9fa;
+                    border-radius: 8px;
+                }
+
+                .stat-card {
+                    text-align: center;
+                    background-color: #007bff;
+                    color: white;
+                    padding: 20px;
+                    border-radius: 8px;
+                    width: 100%;
+                    margin: 0 10px;
+                }
+
+                .stat-value {
+                    font-size: 2rem;
+                    font-weight: bold;
+                }
+
+                .stat-label {
+                    margin-top: 10px;
+                }
+
+                .card-container {
+                    display: flex;
+                    justify-content: space-between;
+                    flex-wrap: wrap;
+                    gap: 20px;
+                }
+
+                .button-group {
+                    margin: 20px 0;
+                    text-align: center;
+                }
+            `}</style>
         </div>
     );
 }

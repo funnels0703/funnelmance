@@ -292,7 +292,7 @@ const deleteCustomors = async (ids) => {
 // url_code_setting의 최신 5개 데이터 가져오기
 const getRecentUrlCodeSettings = async () => {
     return await prisma.url_code_setting.findMany({
-        take: 10,
+        take: 8,
         orderBy: {
             created_at: 'desc',
         },
