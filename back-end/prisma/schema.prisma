@@ -112,23 +112,18 @@ model url_code_setting {
 }
 
 model user {
-  user_id    Int        @id @default(autoincrement())
-  username   String     @unique(map: "username") @db.VarChar(255)
-  password   String     @db.VarChar(255)
-  name       String     @db.VarChar(255)
-  role       user_role? @default(USER)
-  is_active  Boolean?   @default(true)
-  created_at DateTime?  @default(now()) @db.Timestamp(0)
-  updated_at DateTime?  @default(now()) @db.Timestamp(0)
+  user_id    Int       @id @default(autoincrement())
+  username   String    @unique(map: "username") @db.VarChar(255)
+  password   String    @db.VarChar(255)
+  name       String    @db.VarChar(255)
+  role       String?   @db.VarChar(20)
+  is_active  Boolean?  @default(true)
+  created_at DateTime? @default(now()) @db.Timestamp(0)
+  updated_at DateTime? @default(now()) @db.Timestamp(0)
 }
 
 model user_settings {
   user_id                   Int     @id
   customer_data_settings    String? @db.VarChar(255)
   advertising_data_settings String? @db.VarChar(255)
-}
-
-enum user_role {
-  USER
-  ADMIN
 }
