@@ -165,7 +165,7 @@ function CustomorDataPage({ title, get_status, put_status }) {
 
     return (
         <div className="container">
-            <h2>{title}</h2>
+            {/* <h2>{title}</h2> */}
 
             {/* filters 상태와 handleFilterChange 함수를 FilterComponent에 전달 */}
             <FilterComponent
