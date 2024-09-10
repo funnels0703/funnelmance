@@ -29,7 +29,9 @@ function FilterComponent({ filters, onFilterChange }) {
   const [isDateDropdownOpen, setIsDateDropdownOpen] = useState(false); // 날짜 필터 열림/닫힘 상태
   const [selectedDateOption, setSelectedDateOption] = useState("오늘");
 
-  const [isCompanyDropdownOpen, setIsCompanyDropdownOpen] = useState(false); // 날짜 필터 열림/닫힘 상태
+  const [isCompanyDropdownOpen, setIsCompanyDropdownOpen] = useState(false); // 회사 필터 열림/닫힘 상태
+  const [companyInput, setCompanyInput] = useState(""); // 회사 필터 검색 입력값
+  const [selectedCompany, setSelectedCompany] = useState(""); // 선택된 회사
 
   const handleDropdownClick = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -53,10 +55,20 @@ function FilterComponent({ filters, onFilterChange }) {
   const handleCompanyDropdownClick = () => {
     setIsCompanyDropdownOpen(!isCompanyDropdownOpen);
   };
+
   const handleDateOptionClick = (option, value) => {
     setSelectedDateOption(option);
     setIsDateDropdownOpen(false);
     updateDateRange(value);
+  };
+
+  const handleCompanyOptionClick = (company) => {
+    setSelectedCompany(company);
+    setIsCompanyDropdownOpen(false);
+    onFilterChange({
+      ...filters,
+      company_name: company,
+    });
   };
 
   const dateOptions = [
@@ -66,6 +78,12 @@ function FilterComponent({ filters, onFilterChange }) {
     { label: "어제", value: "yesterday" },
     { label: "지난주 (오늘 제외)", value: "lastweek" },
   ];
+
+  const companyOptions = ["회사 1", "회사 2", "회사 3"]; // 회사 필터 옵션
+
+  const filteredCompanyOptions = companyOptions.filter((company) =>
+    company.toLowerCase().includes(companyInput.toLowerCase())
+  );
 
   const updateDateRange = (option) => {
     const today = new Date();
@@ -182,12 +200,36 @@ function FilterComponent({ filters, onFilterChange }) {
         </div>
       </div>
 
-      <div
-        className="company-custom-select"
-        onClick={handleCompanyDropdownClick}
-      >
-        <input type="text" placeholder="조회할 매체를 선택하세요" />
-        <button>등록</button>
+      {/* 회사 필터 */}
+      <div className="company-filter">
+        <div
+          className="company-custom-select"
+          onClick={handleCompanyDropdownClick}
+        >
+          <input
+            type="text"
+            placeholder="조회할 매체를 선택하세요"
+            value={companyInput}
+            onChange={(e) => setCompanyInput(e.target.value)}
+          />
+          <button>등록</button>
+        </div>
+
+        {isCompanyDropdownOpen && (
+          <ul className="custom-options">
+            {filteredCompanyOptions.map((company, index) => (
+              <li
+                key={index}
+                onClick={() => handleCompanyOptionClick(company)}
+                className={`option-item ${
+                  selectedCompany === company ? "selected" : ""
+                }`}
+              >
+                {company}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
       <style jsx>{`
@@ -227,6 +269,9 @@ function FilterComponent({ filters, onFilterChange }) {
           display: flex;
           align-items: center;
           justify-content: space-between;
+        }
+        .company-filter {
+          position: relative;
         }
         .company-custom-select {
           padding: 15px 17px;
@@ -313,7 +358,6 @@ function FilterComponent({ filters, onFilterChange }) {
         }
         .date-filter {
           position: relative;
-
           height: 50px;
           display: flex;
           align-items: center;
@@ -338,7 +382,7 @@ function FilterComponent({ filters, onFilterChange }) {
           margin: 0 15px;
         }
         .calendar-icon {
-          margin: 0 10px;
+          margin: 0 -8px;
         }
         .lineSeper {
           font-size: 26px;
