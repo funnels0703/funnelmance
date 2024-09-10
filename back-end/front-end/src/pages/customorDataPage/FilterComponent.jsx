@@ -382,7 +382,7 @@ function FilterComponent({ filters, onFilterChange }) {
           margin: 0 15px;
         }
         .calendar-icon {
-          margin: 0 10px;
+          margin: 0 -8px;
         }
         .lineSeper {
           font-size: 26px;
