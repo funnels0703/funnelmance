@@ -43,6 +43,7 @@ function SideMenu() {
       subMenu: [
         { title: "병원/이벤트/매체 리스트", path: "/admin/listsetting" },
         { title: "지점별 이벤트", path: "/" },
+        { title: "계정 관리", path: "/admin/UserManagement" },
       ],
     },
     { title: "휴지통", path: "/trashCanData" },
