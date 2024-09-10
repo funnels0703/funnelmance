@@ -326,12 +326,12 @@ function CustomorDataPage({ title, get_status, put_status }) {
                     disabled={!editState[customor.id]}
                   />
                 </td>
-                <td style={{ width: "12%" }}>
+                <td style={{ width: "11%" }}>
                   <input
                     type="text"
                     value={
                       customor.created_at
-                        ? customor.created_at.split("T")[0]
+                        ? customor.created_at.split(".")[0]
                         : ""
                     }
                     onChange={(e) =>
@@ -451,7 +451,7 @@ function CustomorDataPage({ title, get_status, put_status }) {
 
           th {
             background-color: #ededed;
-            padding: 16px 0 15px;
+            padding: 16px 8px 15px;
           }
           td {
             font-weight: 300;
