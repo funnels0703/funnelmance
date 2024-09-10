@@ -6,10 +6,12 @@ const userRoutes = require("./userRoutes");
 const customorRoutes = require("./customorRoutes");
 const urlCodeRoutes = require("./urlCodeRoutes");
 const listRoutes = require("./listRoutes");
+const tmRoutes = require("./tmRoutes");
 
 router.use("/urlcode", urlCodeRoutes);
 router.use("/customor", customorRoutes);
 router.use("/list", listRoutes);
 router.use("/user", userRoutes);
+router.use("/tm", tmRoutes);
 
 module.exports = router;
