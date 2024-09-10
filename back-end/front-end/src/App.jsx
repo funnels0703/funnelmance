@@ -9,6 +9,8 @@ import CustomorDataPage from "./pages/customorDataPage/CustomorDataPage.jsx";
 import Layout from "./layout/Layout.jsx";
 import TabComponent from "./pages/admin/listsetting/TabComponent.jsx";
 import UserManagement from "./pages/admin/user/UserManagement.jsx";
+import NoticeBoard from "./pages/tm/NoticeBoard.jsx";
+import NoticeDetail from "./pages/tm/NoticeDetail.jsx";
 import Login from "./pages/login/Login.jsx";
 
 function App() {
@@ -42,8 +44,14 @@ function App() {
                 />
               }
             />
+            {/* 관리자 */}
             <Route path="/admin/listsetting" element={<TabComponent />} />
             <Route path="/admin/UserManagement" element={<UserManagement />} />
+
+            {/* TM - 공지 */}
+            <Route path="/tm/notices" element={<NoticeBoard />} />
+            <Route path="/tm/notices/new" element={<NoticeDetail />} />
+            <Route path="/tm/notices/:id" element={<NoticeDetail />} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>

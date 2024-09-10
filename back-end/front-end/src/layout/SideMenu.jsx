@@ -30,7 +30,7 @@ function SideMenu() {
         { title: "담당자 업무 현황", path: "/tm" },
         { title: "방문 데이터", path: "/" },
         { title: "예약달력", path: "/" },
-        { title: "공지", path: "/" },
+        { title: "공지", path: "/tm/notices" },
       ],
     },
     {
