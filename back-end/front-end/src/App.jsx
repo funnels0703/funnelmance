@@ -9,6 +9,7 @@ import CustomorDataPage from "./pages/customorDataPage/CustomorDataPage.jsx";
 import Layout from "./layout/Layout.jsx";
 import TabComponent from "./pages/admin/listsetting/TabComponent.jsx";
 import UserManagement from "./pages/admin/user/UserManagement.jsx";
+import Login from "./pages/login/Login.jsx";
 
 function App() {
   return (
@@ -16,6 +17,8 @@ function App() {
       <Router>
         <Layout>
           <Routes>
+            <Route path="/login" element={<Login />} />
+
             <Route path="/code-generator" element={<CodeGenerator />} />
             <Route path="/:code/:urlCode" element={<CodePage />} />
             {/* URL 코드에 따른 페이지 */}
