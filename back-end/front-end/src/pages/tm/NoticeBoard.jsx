@@ -13,7 +13,6 @@ const NoticeBoard = () => {
       try {
         const response = await axios.get(`/api/tm/notices`);
         const data = response.data;
-        console.log(data);
         // 서버 응답 구조를 확인하고 데이터가 정의되어 있는지 확인
         if (data && data.notices) {
           setNotices(data.notices);
@@ -44,7 +43,7 @@ const NoticeBoard = () => {
 
   return (
     <div>
-      <h1>Notice Board</h1>
+      <h1>공지사항</h1>
       <button onClick={handleCreateNewClick}>Create New Notice</button>
       <table>
         <thead>
@@ -63,7 +62,7 @@ const NoticeBoard = () => {
                 <td>{index + 1}</td> {/* 전체 공지사항에서의 순서 번호 */}
                 <td>{notice.type}</td>
                 <td>{notice.title}</td>
-                <td>{notice.author}</td>
+                <td>{notice.user.username}</td> {/* 작성자 이름 */}
                 <td>{new Date(notice.createdAt).toLocaleDateString()}</td>{" "}
                 {/* 날짜 포맷팅 */}
               </tr>

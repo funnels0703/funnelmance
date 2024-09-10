@@ -1,5 +1,3 @@
-// src/components/NoticeDetail.js
-
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -7,10 +5,12 @@ import axios from "axios";
 const NoticeDetail = () => {
   const { id } = useParams();
   const [notice, setNotice] = useState({
-    title: "title",
-    content: "content",
+    title: "",
+    content: "",
     type: "NOTICE",
-    author_id: 1,
+    user: {
+      username: "",
+    },
   });
   const [isEditing, setIsEditing] = useState(false);
   const navigate = useNavigate();
@@ -21,7 +21,6 @@ const NoticeDetail = () => {
         try {
           const response = await axios.get(`/api/tm/notices/${id}`);
           setNotice(response.data);
-          setIsEditing(true);
         } catch (error) {
           console.error("Error fetching notice detail:", error);
         }
@@ -81,11 +80,8 @@ const NoticeDetail = () => {
     }
   };
 
-  if (!notice) return <p>Loading...</p>;
-
   return (
     <div>
-      <h1>{isEditing ? "Edit Notice" : "Create New Notice"}</h1>
       <div>
         <label>Title:</label>
         <input
@@ -93,6 +89,7 @@ const NoticeDetail = () => {
           name="title"
           value={notice.title}
           onChange={handleChange}
+          disabled={!isEditing} // 수정 모드일 때만 활성화
           required
         />
       </div>
@@ -102,20 +99,35 @@ const NoticeDetail = () => {
           name="content"
           value={notice.content}
           onChange={handleChange}
+          disabled={!isEditing} // 수정 모드일 때만 활성화
           required
         />
       </div>
       <div>
         <label>Type:</label>
-        <select name="type" value={notice.type} onChange={handleChange}>
+        <select
+          name="type"
+          value={notice.type}
+          onChange={handleChange}
+          disabled={!isEditing} // 수정 모드일 때만 활성화
+        >
           <option value="NOTICE">공지</option>
           <option value="GENERAL">일반</option>
         </select>
       </div>
-      <button onClick={handleSaveClick}>
-        {isEditing ? "Save Changes" : "Create Notice"}
-      </button>
-      {isEditing && <button onClick={handleDeleteClick}>Delete Notice</button>}
+      <div>
+        <label>Author:</label>
+        <input type="text" value={notice.user.username} disabled />
+      </div>
+      {isEditing ? (
+        <>
+          <button onClick={handleSaveClick}>Save Changes</button>
+          <button onClick={handleDeleteClick}>Delete Notice</button>
+          <button onClick={() => setIsEditing(false)}>Cancel</button>
+        </>
+      ) : (
+        <button onClick={() => setIsEditing(true)}>Edit Notice</button>
+      )}
     </div>
   );
 };
