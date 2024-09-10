@@ -14,6 +14,12 @@ const getNotices = async () => {
       created_at: true,
       type: true,
       author_id: true,
+      user: {
+        // 작성자 정보도 포함
+        select: {
+          username: true,
+        },
+      },
     },
   });
 
@@ -23,6 +29,13 @@ const getNotices = async () => {
 const getNoticeById = async (id) => {
   return await prisma.notice_board.findUnique({
     where: { id: parseInt(id) },
+    include: {
+      user: {
+        select: {
+          username: true,
+        },
+      },
+    },
   });
 };
 
