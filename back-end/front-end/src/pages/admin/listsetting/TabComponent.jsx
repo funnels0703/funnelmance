@@ -16,7 +16,7 @@ function TabComponent() {
         const urls = {
             hospitals: '/api/list/hospitals',
             events: '/api/list/events',
-            advertising_companys: '/api/list/advertising_companies',
+            advertising_companies: '/api/list/advertising_companies',
         };
         try {
             const response = await axios.get(urls[activeTab]);
@@ -84,8 +84,8 @@ function TabComponent() {
                     이벤트 추가
                 </button>
                 <button
-                    className={`tab ${activeTab === 'advertising_companys' ? 'active' : ''}`}
-                    onClick={() => handleTabChange('advertising_companys')}
+                    className={`tab ${activeTab === 'advertising_companies' ? 'active' : ''}`}
+                    onClick={() => handleTabChange('advertising_companies')}
                 >
                     매체 추가
                 </button>
