@@ -15,4 +15,5 @@ router.use('/list', listRoutes);
 router.use('/user', userRoutes);
 router.use('/tm', tmRoutes);
 router.use('/advertise', advertiseRoute);
+
 module.exports = router;

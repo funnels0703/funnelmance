@@ -200,7 +200,7 @@ function CustomorDataPage({ title, get_status, put_status }) {
                             const company = companyOptions.find((company) => company.id === companyId);
                             if (company) {
                                 // 일치하는 회사가 있으면 StatCard에 표시
-                                return <StatCard key={company.id} label={company.name} value="값" />;
+                                return <StatCard key={company.id} label={company.name} value="2" />;
                             }
                             return null; // 일치하는 회사가 없으면 아무것도 반환하지 않음
                         })}

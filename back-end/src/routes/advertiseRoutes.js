@@ -4,7 +4,7 @@ const {
     updateAdvertisingData,
     getAdvertisingCompanies,
     getUserSettings,
-} = require('../controllers/AdvertiseController');
+} = require('../controllers/advertiseController');
 const authMiddleware = require('../middleware/authMiddleware');
 
 const router = express.Router();
