@@ -127,7 +127,7 @@ model user {
 model user_settings {
   user_id                   Int     @id
   customer_data_settings    String? @db.VarChar(255)
-  advertising_data_settings String? @db.VarChar(255)
+  advertising_data_settings Json?
 }
 
 model notice_board {
