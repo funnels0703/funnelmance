@@ -4,7 +4,14 @@ import axios from 'axios';
 import { faCalendarAlt, faChevronLeft, faChevronRight, faChevronDown } from '@fortawesome/free-solid-svg-icons';
 import { jwtDecode } from 'jwt-decode'; // jwt-decode 임포트
 
-function FilterComponent({ filters, onFilterChange }) {
+function FilterComponent({
+    filters,
+    onFilterChange,
+    checkedCompanies,
+    setCheckedCompanies,
+    companyOptions,
+    setCompanyOptions,
+}) {
     const formatKoreanDate = (date) => {
         const options = {
             year: 'numeric',
@@ -17,10 +24,9 @@ function FilterComponent({ filters, onFilterChange }) {
     // 로컬 스토리지에서 토큰을 가져오고 userId를 추출
     const getUserIdFromToken = () => {
         const token = localStorage.getItem('token'); // 로컬 스토리지에서 토큰 추출
-        console.log(token);
         if (token) {
             const decoded = jwtDecode(token); // JWT 디코딩
-            console.log(decoded.userId);
+            // console.log(decoded.userId);
 
             return decoded.userId; // userId 추출
         }
@@ -41,8 +47,8 @@ function FilterComponent({ filters, onFilterChange }) {
     const [isCompanyDropdownOpen, setIsCompanyDropdownOpen] = useState(false); // 회사 필터 열림/닫힘 상태
     const [companyInput, setCompanyInput] = useState(''); // 회사 필터 검색 입력값
     const [selectedCompany, setSelectedCompany] = useState(''); // 선택된 회사
-    const [companyOptions, setCompanyOptions] = useState([]); // 회사 필터 옵션
-    const [checkedCompanies, setCheckedCompanies] = useState([]); // 체크된 회사 목록
+    // const [companyOptions, setCompanyOptions] = useState([]); // 회사 필터 옵션
+    // const [checkedCompanies, setCheckedCompanies] = useState([]); // 체크된 회사 목록
 
     // 체크박스 클릭 핸들러 (문자열을 배열로 변환 후 처리)
     const handleCheckboxChange = (companyId) => {
@@ -57,8 +63,10 @@ function FilterComponent({ filters, onFilterChange }) {
             ? companiesArray.filter((id) => id !== companyId) // 이미 있으면 제거
             : [...companiesArray, companyId]; // 없으면 추가
 
-        setCheckedCompanies(updatedCheckedCompanies.join(',')); // 문자열로 다시 저장
-        console.log(updatedCheckedCompanies); // 배열 출력
+        // 배열을 오름차순으로 정렬한 후 문자열로 변환하여 저장
+        setCheckedCompanies(updatedCheckedCompanies.sort((a, b) => a - b).join(','));
+
+        // console.log(updatedCheckedCompanies); // 배열 출력
     };
 
     const handleDropdownClick = () => {
