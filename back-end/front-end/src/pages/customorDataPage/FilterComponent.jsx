@@ -47,6 +47,9 @@ function FilterComponent({
     const [isCompanyDropdownOpen, setIsCompanyDropdownOpen] = useState(false); // 회사 필터 열림/닫힘 상태
     const [companyInput, setCompanyInput] = useState(''); // 회사 필터 검색 입력값
     const [selectedCompany, setSelectedCompany] = useState(''); // 선택된 회사
+
+    const [isInitialLoad, setIsInitialLoad] = useState(true); // 초기 로드 여부를 확인하는 상태
+
     // const [companyOptions, setCompanyOptions] = useState([]); // 회사 필터 옵션
     // const [checkedCompanies, setCheckedCompanies] = useState([]); // 체크된 회사 목록
 
@@ -180,7 +183,13 @@ function FilterComponent({
         setCheckedCompanies(updatedCheckedCompanies.sort((a, b) => a - b).join(','));
     };
 
+    // useEffect를 사용하여 checkedCompanies가 변경될 때마다 saveSelectedCompanies 호출
     useEffect(() => {
+        if (isInitialLoad) {
+            setIsInitialLoad(false); // 처음 로드 시에는 업데이트 방지
+            return;
+        }
+
         if (checkedCompanies) {
             saveSelectedCompanies(checkedCompanies);
         }

@@ -251,6 +251,7 @@ function CustomorDataPage({ title, get_status, put_status }) {
                                         type="checkbox"
                                         checked={customor.isSelected}
                                         onChange={() => handleCheckboxChange(index)}
+                                        style={{ textAlign: 'center' }}
                                     />
                                 </td>
                                 <td style={{ width: '2%', textAlign: 'center' }}>{customor.id}</td>
@@ -433,6 +434,7 @@ function CustomorDataPage({ title, get_status, put_status }) {
                         input {
                             width: calc(90% - 30px); /* width에서 10px을 뺍니다 */
                             padding: 5px 0px;
+                            margin: 0px 15px;
                             box-sizing: border-box;
                         }
 
