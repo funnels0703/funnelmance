@@ -223,7 +223,7 @@ function CustomorDataPage({ title, get_status, put_status }) {
                 <thead>
                     <tr>
                         <th style={{ textAlign: 'center' }}>선택</th>
-                        <th>No</th>
+                        <th style={{ textAlign: 'center' }}>No</th>
                         <th>배당 여부</th>
                         <th>병원명</th>
                         <th>매체</th>
@@ -246,14 +246,14 @@ function CustomorDataPage({ title, get_status, put_status }) {
                     ) : (
                         customors.map((customor, index) => (
                             <tr key={customor.id}>
-                                <td style={{ width: '4%' }}>
+                                <td style={{ width: '3%' }}>
                                     <input
                                         type="checkbox"
                                         checked={customor.isSelected}
                                         onChange={() => handleCheckboxChange(index)}
                                     />
                                 </td>
-                                <td style={{ width: '4%' }}>{customor.id}</td>
+                                <td style={{ width: '2%', textAlign: 'center' }}>{customor.id}</td>
                                 <td style={{ width: '5%' }}>
                                     <input
                                         type="text"
@@ -280,7 +280,7 @@ function CustomorDataPage({ title, get_status, put_status }) {
                                         disabled={!editState[customor.id]}
                                     />
                                 </td>
-                                <td style={{ width: '11%' }}>
+                                <td style={{ width: '9%' }}>
                                     <input
                                         type="text"
                                         value={customor.ad_title}
@@ -425,16 +425,15 @@ function CustomorDataPage({ title, get_status, put_status }) {
 
                     th {
                         background-color: #ededed;
-                        padding: 16px 8px 15px;
+                        padding: 16px 15px 15px;
                     }
                     td {
                         font-weight: 300;
                         padding: 27px 0 30px;
                         input {
-                            width: 90%;
-                            padding: 5px;
+                            width: calc(90% - 30px); /* width에서 10px을 뺍니다 */
+                            padding: 5px 0px;
                             box-sizing: border-box;
-                            text-align: center;
                         }
 
                         input:disabled {

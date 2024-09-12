@@ -50,25 +50,6 @@ function FilterComponent({
     // const [companyOptions, setCompanyOptions] = useState([]); // 회사 필터 옵션
     // const [checkedCompanies, setCheckedCompanies] = useState([]); // 체크된 회사 목록
 
-    // 체크박스 클릭 핸들러 (문자열을 배열로 변환 후 처리)
-    const handleCheckboxChange = (companyId) => {
-        // checkedCompanies가 문자열이면 배열로 변환
-        const companiesArray =
-            typeof checkedCompanies === 'string'
-                ? checkedCompanies.split(',').map(Number) // 문자열을 숫자 배열로 변환
-                : checkedCompanies;
-
-        // 체크된 회사 목록 업데이트
-        const updatedCheckedCompanies = companiesArray.includes(companyId)
-            ? companiesArray.filter((id) => id !== companyId) // 이미 있으면 제거
-            : [...companiesArray, companyId]; // 없으면 추가
-
-        // 배열을 오름차순으로 정렬한 후 문자열로 변환하여 저장
-        setCheckedCompanies(updatedCheckedCompanies.sort((a, b) => a - b).join(','));
-
-        // console.log(updatedCheckedCompanies); // 배열 출력
-    };
-
     const handleDropdownClick = () => {
         setIsDropdownOpen(!isDropdownOpen);
     };
@@ -168,7 +149,7 @@ function FilterComponent({
     const userId = getUserIdFromToken(); // userId 추출
 
     // 매체 리스트 저장
-    const saveSelectedCompanies = async () => {
+    const saveSelectedCompanies = async (updatedCheckedCompanies) => {
         try {
             if (!userId) {
                 console.error('유효한 사용자 ID를 찾을 수 없습니다.');
@@ -177,11 +158,34 @@ function FilterComponent({
 
             // 서버에 선택한 매체 ID 전송
             await axios.put(`/api/advertise/settings/${userId}`, { advertisingCompanyIds: checkedCompanies });
-            alert('선택한 매체가 성공적으로 저장되었습니다.');
         } catch (error) {
             console.error('매체 저장 중 오류 발생:', error);
         }
     };
+
+    // 체크박스 클릭 핸들러 (문자열을 배열로 변환 후 처리)
+    const handleCheckboxChange = (companyId) => {
+        // checkedCompanies가 문자열이면 배열로 변환
+        const companiesArray =
+            typeof checkedCompanies === 'string'
+                ? checkedCompanies.split(',').map(Number) // 문자열을 숫자 배열로 변환
+                : checkedCompanies;
+
+        // 체크된 회사 목록 업데이트
+        const updatedCheckedCompanies = companiesArray.includes(companyId)
+            ? companiesArray.filter((id) => id !== companyId) // 이미 있으면 제거
+            : [...companiesArray, companyId]; // 없으면 추가
+
+        // 배열을 오름차순으로 정렬한 후 문자열로 변환하여 저장
+        setCheckedCompanies(updatedCheckedCompanies.sort((a, b) => a - b).join(','));
+    };
+
+    useEffect(() => {
+        if (checkedCompanies) {
+            saveSelectedCompanies(checkedCompanies);
+        }
+    }, [checkedCompanies]); // checkedCompanies가 변경될 때마다 실행
+
     // 매체 리스트 받기 + 광고 회사 ID 가져오기
     useEffect(() => {
         const fetchCompanies = async () => {
@@ -284,7 +288,7 @@ function FilterComponent({
                         value={companyInput}
                         onChange={(e) => setCompanyInput(e.target.value)}
                     />
-                    <button onClick={saveSelectedCompanies}>등록</button>
+                    {/* <button onClick={saveSelectedCompanies}>등록</button> */}
                 </div>
 
                 {isCompanyDropdownOpen && (
@@ -412,7 +416,7 @@ function FilterComponent({
                     }
 
                     .option-item {
-                        padding: 10px 15px;
+                        padding: 15px;
                         font-size: 16px;
                         color: #333;
                         cursor: pointer;
