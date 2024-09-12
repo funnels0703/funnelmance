@@ -281,7 +281,7 @@ function CustomorDataPage({ title, get_status, put_status }) {
                                         disabled={!editState[customor.id]}
                                     />
                                 </td>
-                                <td style={{ width: '9%' }}>
+                                <td style={{ width: '11%' }}>
                                     <input
                                         type="text"
                                         value={customor.ad_title}
