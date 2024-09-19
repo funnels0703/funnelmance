@@ -376,7 +376,7 @@ function CustomorDataPage({ title, get_status, put_status }) {
 
       <style jsx>{`
         .container {
-          padding: 20px;
+          padding: 50px 58px;
           max-width: 100%;
           overflow-x: auto;
           .itdependson {

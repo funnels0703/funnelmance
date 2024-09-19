@@ -25,8 +25,7 @@ function Layout({ children }) {
 
           .content {
             flex-grow: 1;
-            padding: 20px;
-            margin: 50px 35px;
+            margin: 47px 27px;
             background-color: white;
             border-radius: 10px;
             border: 1px #efefef;
