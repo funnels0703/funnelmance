@@ -79,6 +79,7 @@ model hospital_name {
   status                                                            String?            @default("활성화") @db.VarChar(50)
   url_code_setting_id                                               Int?
   manager                                                           String?            @db.VarChar(60)
+  hospital_code                                                     String             @db.VarChar(60)
   url_code_setting                                                  url_code_setting?  @relation(fields: [url_code_setting_id], references: [id], map: "hospital_name_ibfk_1")
   url_code_setting_url_code_setting_hospital_name_idTohospital_name url_code_setting[] @relation("url_code_setting_hospital_name_idTohospital_name")
 
@@ -98,6 +99,7 @@ model url_code_setting {
   event_name_id                                                                    Int?
   hospital_name_id                                                                 Int?
   advertising_company_id                                                           Int?
+  ad_spending                                                                      ad_spending[]
   advertising_company                                                              advertising_company[]
   customor_db_customor_db_url_code_setting_idTourl_code_setting                    customor_db[]         @relation("customor_db_url_code_setting_idTourl_code_setting")
   customor_db_customor_db_url_codeTourl_code_setting                               customor_db[]         @relation("customor_db_url_codeTourl_code_setting")
@@ -121,6 +123,7 @@ model user {
   is_active    Boolean?       @default(true)
   created_at   DateTime?      @default(now()) @db.Timestamp(0)
   updated_at   DateTime?      @default(now()) @db.Timestamp(0)
+  ad_spending  ad_spending[]
   notice_board notice_board[]
 }
 
@@ -141,6 +144,20 @@ model notice_board {
   user       user              @relation(fields: [author_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "notice_board_ibfk_1")
 
   @@index([author_id], map: "author_id")
+}
+
+model ad_spending {
+  id                  Int              @id @default(autoincrement())
+  user_id             Int
+  url_code_setting_id Int
+  ad_spend            Int
+  spend_date          DateTime         @db.Date
+  created_at          DateTime?        @default(now()) @db.Timestamp(0)
+  url_code_setting    url_code_setting @relation(fields: [url_code_setting_id], references: [id], onDelete: Cascade, map: "fk_url_code_setting")
+  user                user             @relation(fields: [user_id], references: [user_id], onDelete: Cascade, map: "fk_user")
+
+  @@index([url_code_setting_id], map: "fk_url_code_setting")
+  @@index([user_id], map: "fk_user")
 }
 
 enum notice_board_type {
