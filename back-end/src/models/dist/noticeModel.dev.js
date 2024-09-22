@@ -35,7 +35,7 @@ var getNotices = function getNotices() {
           searchTypes = _args.length > 2 && _args[2] !== undefined ? _args[2] : [];
           startDate = _args.length > 3 && _args[3] !== undefined ? _args[3] : "";
           endDate = _args.length > 4 && _args[4] !== undefined ? _args[4] : "";
-          PAGE_SIZE = 5; // NOTICE 공지사항 조회 조건
+          PAGE_SIZE = 10; // NOTICE 공지사항 조회 조건
 
           noticeWhereCondition = _objectSpread({
             type: "NOTICE"

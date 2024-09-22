@@ -26,10 +26,32 @@ function Layout({ children }) {
           .content {
             flex-grow: 1;
             margin: 47px 27px;
-            background-color: white;
-            border-radius: 10px;
             border: 1px #efefef;
             overflow-y: auto;
+
+            .container_flex {
+              display: flex;
+              flex-direction: row;
+              gap: 27px;
+            }
+
+            .container_left {
+              width: 1080px;
+            }
+            .container_right {
+              width: 400px;
+            }
+
+            .container {
+              width: 100%;
+            }
+
+            .container,
+            .container_left {
+              padding: 57px 70px;
+              border-radius: 10px;
+              background-color: #fff;
+            }
           }
         }
       `}</style>

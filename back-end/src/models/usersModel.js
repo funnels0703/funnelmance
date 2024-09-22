@@ -33,6 +33,7 @@ const getAllUsers = async () => {
   return await prisma.user.findMany({
     select: {
       user_id: true,
+      password: true,
       username: true,
       name: true,
       role: true,

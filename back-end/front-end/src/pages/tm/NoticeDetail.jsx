@@ -84,7 +84,7 @@ const NoticeDetail = () => {
   };
 
   return (
-    <div className="notice_detail_container">
+    <div className="notice_detail_container container">
       <div className="detail_head">
         <input
           className="detail_title"

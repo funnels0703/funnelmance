@@ -159,7 +159,7 @@ const NoticeBoard = () => {
   };
 
   return (
-    <div className="notice_board_container">
+    <div className="notice_board_container container">
       <form onSubmit={handleSearch}>
         <div className="search_box">
           <div className="search_type_box">

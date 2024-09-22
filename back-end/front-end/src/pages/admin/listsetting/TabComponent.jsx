@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import TitleBox from "../../../components/TitleBox";
 
 function TabComponent() {
   const [activeTab, setActiveTab] = useState("hospitals");
@@ -73,20 +74,20 @@ function TabComponent() {
   };
 
   return (
-    <div className="listContainer">
-      <div className="TabSetting">
-        <div className="listHeader">
-          <div className="listHeaderTitle">
-            <div>관리자페이지</div>
-            <div>
-              {activeTab === "hospitals" && "병원 "}
-              {activeTab === "events" && "이벤트 "}
-              {activeTab === "advertising_company" && "매체 "}등록
-            </div>
-          </div>
-
-          <div className="listLine"></div>
-        </div>
+    <div className="listContainer container_flex">
+      <div className="TabSetting container_left">
+        <TitleBox
+          mainmenu="관리자페이지"
+          submenu={
+            activeTab === "hospitals"
+              ? "병원 등록"
+              : activeTab === "events"
+              ? "이벤트 등록"
+              : activeTab === "advertising_company"
+              ? "매체 등록"
+              : ""
+          }
+        />
         <div className="postForm">
           <label>
             {activeTab === "hospitals" && "병원 이름"}
@@ -236,33 +237,8 @@ function TabComponent() {
       <style jsx>{`
         .listContainer {
           background-color: #f5f6fa;
-          display: flex;
-          flex-direction: row;
-          .listHeader {
-            display: flex;
-            flex-direction: column;
-            width: 940px;
-            .listHeaderTitle {
-              display: flex;
-              justify-content: space-between;
-              color: #979797;
-              font-size: 14px;
-              font-style: normal;
-              font-weight: 400;
-              line-height: normal;
-            }
-            .listLine {
-              width: 940px;
-              margin: 16px 0;
-              height: 2px;
-              background: #efefef;
-            }
-          }
         }
         .TabSetting {
-          background-color: #ffffff;
-          padding: 47px 70px;
-          border-radius: 8px;
           align-items: center;
           display: flex;
           flex-direction: column;
@@ -271,7 +247,6 @@ function TabComponent() {
           display: flex;
           flex-direction: column;
           height: 204px;
-          margin-left: 27px;
         }
 
         .tab {
@@ -298,7 +273,6 @@ function TabComponent() {
           display: flex;
           flex-direction: row;
           align-items: center;
-          margin: 61px 0 25px;
           width: 940px;
           justify-content: space-between;
           label {

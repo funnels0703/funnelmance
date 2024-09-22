@@ -60,7 +60,7 @@ const getNoticeByIdController = async (req, res) => {
 };
 
 const createNoticeController = async (req, res) => {
-  const { title, content, type, author_id } = req.body;
+  const { title, content, type, author_id = 2 } = req.body;
   console.log(title, content, type, author_id);
   try {
     const newNotice = await createNotice({ title, content, type, author_id });

@@ -100,13 +100,13 @@ var getNoticeByIdController = function getNoticeByIdController(req, res) {
 };
 
 var createNoticeController = function createNoticeController(req, res) {
-  var _req$body, title, content, type, author_id, newNotice;
+  var _req$body, title, content, type, _req$body$author_id, author_id, newNotice;
 
   return regeneratorRuntime.async(function createNoticeController$(_context3) {
     while (1) {
       switch (_context3.prev = _context3.next) {
         case 0:
-          _req$body = req.body, title = _req$body.title, content = _req$body.content, type = _req$body.type, author_id = _req$body.author_id;
+          _req$body = req.body, title = _req$body.title, content = _req$body.content, type = _req$body.type, _req$body$author_id = _req$body.author_id, author_id = _req$body$author_id === void 0 ? 2 : _req$body$author_id;
           console.log(title, content, type, author_id);
           _context3.prev = 2;
           _context3.next = 5;

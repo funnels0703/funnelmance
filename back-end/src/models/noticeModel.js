@@ -12,7 +12,7 @@ const getNotices = async (
   startDate = "",
   endDate = ""
 ) => {
-  const PAGE_SIZE = 5;
+  const PAGE_SIZE = 10;
 
   // NOTICE 공지사항 조회 조건
   const noticeWhereCondition = {
