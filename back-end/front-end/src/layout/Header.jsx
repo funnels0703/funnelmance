@@ -25,8 +25,10 @@ function Header() {
           background: white;
           box-shadow: 0px 4px 15px 0px rgba(152, 152, 152, 0.2);
           .logo {
-            color: linear-gradient(90deg, #4880ff 0%, #2b4d99 100%);
+            background: linear-gradient(90deg, #4880ff 0%, #2b4d99 100%);
             background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             font-size: 18px;
             font-weight: 900;
           }

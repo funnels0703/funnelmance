@@ -14,13 +14,13 @@ async function getHospitals(req, res) {
 
 // 병원 추가
 async function addHospital(req, res) {
-  const { name, status, manager } = req.body;
+  const { name, status, hospital_code } = req.body;
   if (!name) {
     return res.status(400).send("병원 이름은 필수입니다.");
   }
   try {
     const newHospital = await prisma.hospital_name.create({
-      data: { name, status, manager },
+      data: { name, status, hospital_code },
     });
     res.status(201).json(newHospital);
   } catch (error) {
