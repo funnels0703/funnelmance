@@ -35,10 +35,10 @@ const createUser = async (userData) => {
 };
 
 const getAllUsers = async () => {
-<<<<<<< HEAD
     return await prisma.user.findMany({
         select: {
             user_id: true,
+            password: true,
             username: true,
             name: true,
             role: true,
@@ -47,20 +47,6 @@ const getAllUsers = async () => {
             updated_at: true,
         },
     });
-=======
-  return await prisma.user.findMany({
-    select: {
-      user_id: true,
-      password: true,
-      username: true,
-      name: true,
-      role: true,
-      is_active: true,
-      created_at: true,
-      updated_at: true,
-    },
-  });
->>>>>>> origin/aaa
 };
 
 const updateUser = async (user_id, data) => {
