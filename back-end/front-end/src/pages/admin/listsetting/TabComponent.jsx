@@ -329,8 +329,21 @@ function TabComponent() {
                 </table>
                 {/* 페이지네이션 */}
                 <div className="pagination">
-                    <button onClick={() => handlePageChange(1)}>{'<<'}</button> {/* 첫 페이지 */}
-                    <button onClick={() => handlePageChange(currentPage - 1)}>{'<'}</button> {/* 이전 페이지 */}
+                    <button onClick={() => handlePageChange(1)}>
+                        <img
+                            src={process.env.PUBLIC_URL + '/images/page/start.png'}
+                            className="doubleArrow"
+                            alt="첫 페이지"
+                        />
+                    </button>
+                    {/* 이전 페이지 */}
+                    <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
+                        <img
+                            src={process.env.PUBLIC_URL + '/images/page/before.png'}
+                            className="singleArrow"
+                            alt="이전 페이지"
+                        />
+                    </button>
                     {Array.from({ length: totalPages }, (_, index) => index + 1)
                         .slice((Math.ceil(currentPage / 10) - 1) * 10, Math.ceil(currentPage / 10) * 10)
                         .map((page) => (
@@ -343,8 +356,21 @@ function TabComponent() {
                             </button>
                         ))}
                     <button onClick={() => handlePageChange(currentPage + 10)}>{'...'}</button> {/* 다음 페이지 묶음 */}
-                    <button onClick={() => handlePageChange(currentPage + 1)}>{'>'}</button> {/* 다음 페이지 */}
-                    <button onClick={() => handlePageChange(totalPages)}>{'>>'}</button> {/* 마지막 페이지 */}
+                    <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
+                        <img
+                            src={process.env.PUBLIC_URL + '/images/page/end.png'}
+                            className="singleArrow"
+                            alt="다음 페이지"
+                        />
+                    </button>
+                    {/* 마지막 페이지 */}
+                    <button onClick={() => handlePageChange(totalPages)}>
+                        <img
+                            src={process.env.PUBLIC_URL + '/images/page/next.png'}
+                            className="doubleArrow"
+                            alt="마지막 페이지"
+                        />
+                    </button>
                 </div>
                 {showDeleteBox && (
                     <DeleteBox message={deleteMessage} onCancel={handleCancelDelete} onConfirm={handleConfirmDelete} />
@@ -492,6 +518,7 @@ function TabComponent() {
                 }
                 .data-table td {
                     height: 60px;
+                    border-bottom: 1px solid rgba(151, 151, 151, 0.6);
                 }
                 .data-table th {
                     background-color: #ededed;
@@ -568,18 +595,30 @@ function TabComponent() {
                 }
 
                 .pagination button {
-                    margin: 0 5px;
-                    padding: 5px 10px;
-                    border: 1px solid #ccc;
-                    background-color: #fff;
-                    cursor: pointer;
-                    color: #999;
+                    background-color: white;
+                    border: none;
+                    color: #979797;
+                    font-size: 14px;
+                    font-style: normal;
+                    font-weight: 400;
+                    line-height: normal;
+                    margin: 0 12.5px;
                 }
-
+                .doubleArrow {
+                    width: 11px;
+                    height: 12px;
+                }
+                .singleArrow {
+                    width: 6px;
+                    height: 12px;
+                }
                 .pagination button.currentPage {
-                    font-weight: bold;
-                    color: #000;
-                    text-decoration: underline;
+                    color: #202224;
+                    font-size: 14px;
+                    font-style: normal;
+                    font-weight: 400;
+                    line-height: normal;
+                    text-decoration-line: underline;
                 }
 
                 .pagination button:hover {
