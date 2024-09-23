@@ -3,9 +3,24 @@ const prisma = new PrismaClient();
 
 // 병원 정보 조회
 async function getHospitals(req, res) {
+    const { page = 1, limit = 10 } = req.query; // 클라이언트에서 페이지 번호와 제한값을 받음
+    const pageInt = parseInt(page, 10);
+    const limitInt = parseInt(limit, 10);
+
     try {
-        const hospitals = await prisma.hospital_name.findMany();
-        res.json(hospitals);
+        const totalItems = await prisma.hospital_name.count(); // 전체 항목 수 계산
+        const totalPages = Math.ceil(totalItems / limitInt); // 전체 페이지 수 계산
+
+        const hospitals = await prisma.hospital_name.findMany({
+            skip: (pageInt - 1) * limitInt, // 페이지네이션 적용: 건너뛸 항목 수
+            take: limitInt, // 페이지당 가져올 항목 수
+        });
+
+        res.json({
+            items: hospitals,
+            totalPages, // 전체 페이지 수 반환
+            currentPage: pageInt, // 현재 페이지 반환
+        });
     } catch (error) {
         console.error('Error fetching hospitals:', error);
         res.status(500).send('서버 오류입니다.');
@@ -31,9 +46,24 @@ async function addHospital(req, res) {
 
 // 이벤트 정보 조회
 async function getEvents(req, res) {
+    const { page = 1, limit = 10 } = req.query;
+    const pageInt = parseInt(page, 10);
+    const limitInt = parseInt(limit, 10);
+
     try {
-        const events = await prisma.event_name.findMany();
-        res.json(events);
+        const totalItems = await prisma.event_name.count(); // 전체 항목 수 계산
+        const totalPages = Math.ceil(totalItems / limitInt); // 전체 페이지 수 계산
+
+        const events = await prisma.event_name.findMany({
+            skip: (pageInt - 1) * limitInt,
+            take: limitInt,
+        });
+
+        res.json({
+            items: events,
+            totalPages, // 전체 페이지 수 반환
+            currentPage: pageInt, // 현재 페이지 반환
+        });
     } catch (error) {
         console.error('Error fetching events:', error);
         res.status(500).send('서버 오류입니다.');
@@ -59,9 +89,24 @@ async function addEvent(req, res) {
 
 // 매체 정보 조회
 async function getAdvertisingCompanies(req, res) {
+    const { page = 1, limit = 10 } = req.query;
+    const pageInt = parseInt(page, 10);
+    const limitInt = parseInt(limit, 10);
+
     try {
-        const advertisingCompanies = await prisma.advertising_company.findMany();
-        res.json(advertisingCompanies);
+        const totalItems = await prisma.advertising_company.count(); // 전체 항목 수 계산
+        const totalPages = Math.ceil(totalItems / limitInt); // 전체 페이지 수 계산
+
+        const advertisingCompanies = await prisma.advertising_company.findMany({
+            skip: (pageInt - 1) * limitInt,
+            take: limitInt,
+        });
+
+        res.json({
+            items: advertisingCompanies,
+            totalPages, // 전체 페이지 수 반환
+            currentPage: pageInt, // 현재 페이지 반환
+        });
     } catch (error) {
         console.error('Error fetching advertising companies:', error);
         res.status(500).send('서버 오류입니다.');

@@ -11,19 +11,25 @@ function TabComponent() {
     const [editableId, setEditableId] = useState(null);
     const [selectedIds, setSelectedIds] = useState([]); // 선택된 항목을 저장하는 상태 추가
 
+    const [currentPage, setCurrentPage] = useState(1); // 현재 페이지
+    const [totalPages, setTotalPages] = useState(1); // 전체 페이지 수
+    const itemsPerPage = 10; // 한 페이지에 표시할 항목 수
+
     useEffect(() => {
-        fetchData();
-    }, [activeTab]);
+        fetchData(); // 페이지나 탭이 변경될 때 데이터를 다시 불러옴
+    }, [activeTab, currentPage]); // activeTab과 currentPage를 의존성 배열에 추가
 
     const fetchData = async () => {
         const urls = {
             hospitals: '/api/list/hospitals',
             events: '/api/list/events',
-            advertising_company: '/api/list/advertising_companies',
+            advertising_companies: '/api/list/advertising_companies',
         };
         try {
-            const response = await axios.get(urls[activeTab]);
-            setData(response.data.map((item) => ({ ...item, edit: false })));
+            const response = await axios.get(`${urls[activeTab]}?page=${currentPage}&limit=${itemsPerPage}`);
+            setData(response.data.items.map((item) => ({ ...item, edit: false })));
+            setTotalPages(response.data.totalPages); // 서버에서 받은 전체 페이지 수
+            setCurrentPage(response.data.currentPage); // 서버에서 받은 현재 페이지
         } catch (error) {
             console.error('데이터 로딩 오류:', error);
             alert('데이터를 불러오는데 실패했습니다.');
@@ -35,6 +41,8 @@ function TabComponent() {
         setActiveTab(tab);
         setName('');
         setHospital_code('');
+        setCurrentPage(1);
+        fetchData();
     };
 
     const handleAdd = async () => {
@@ -113,6 +121,13 @@ function TabComponent() {
         }
     };
 
+    // ----------------------------------- 페이지 네이션
+    const handlePageChange = (page) => {
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page); // 페이지 변경
+        }
+    };
+
     return (
         <div className="listContainer container_flex">
             <div className="TabSetting container_left">
@@ -123,7 +138,7 @@ function TabComponent() {
                             ? '병원 등록'
                             : activeTab === 'events'
                             ? '이벤트 등록'
-                            : activeTab === 'advertising_company'
+                            : activeTab === 'advertising_companies'
                             ? '매체 등록'
                             : ''
                     }
@@ -132,12 +147,12 @@ function TabComponent() {
                     <label>
                         {activeTab === 'hospitals' && '병원 이름'}
                         {activeTab === 'events' && '이벤트 이름'}
-                        {activeTab === 'advertising_company' && '매체 이름'}
+                        {activeTab === 'advertising_companies' && '매체 이름'}
                         <input
                             className={`listInput ${
                                 activeTab === 'events'
                                     ? 'longInput'
-                                    : activeTab === 'advertising_company'
+                                    : activeTab === 'advertising_companies'
                                     ? 'longInput2'
                                     : ''
                             }`}
@@ -180,7 +195,7 @@ function TabComponent() {
                             ? '병원'
                             : activeTab === 'events'
                             ? '이벤트'
-                            : activeTab === 'advertising_company'
+                            : activeTab === 'advertising_companies'
                             ? '매체'
                             : ''}{' '}
                         리스트
@@ -193,12 +208,25 @@ function TabComponent() {
                 <table className="data-table">
                     <thead>
                         <tr>
-                            <th style={{ textAlign: 'center', width: '8%' }}>선택</th>
+                            <th
+                                style={{
+                                    textAlign: 'center',
+                                    width: activeTab === 'hospitals' ? '8%' : '4%',
+                                }}
+                            >
+                                선택
+                            </th>
                             {activeTab === 'hospitals' && <th style={{ width: '12%' }}>병원코드</th>}
                             <th style={{ width: '20%' }}>병원이름</th>
                             <th style={{ paddingLeft: '20px', width: '18%' }}>진행/종료</th>
                             {activeTab === 'hospitals' && <th style={{ width: '20%' }}>담당자</th>}
-                            <th style={{ width: '8%' }}>상태</th>
+                            <th
+                                style={{
+                                    width: activeTab === 'hospitals' ? '8%' : '4%',
+                                }}
+                            >
+                                상태
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -281,6 +309,25 @@ function TabComponent() {
                         ))}
                     </tbody>
                 </table>
+                {/* 페이지네이션 */}
+                <div className="pagination">
+                    <button onClick={() => handlePageChange(1)}>{'<<'}</button> {/* 첫 페이지 */}
+                    <button onClick={() => handlePageChange(currentPage - 1)}>{'<'}</button> {/* 이전 페이지 */}
+                    {Array.from({ length: totalPages }, (_, index) => index + 1)
+                        .slice((Math.ceil(currentPage / 10) - 1) * 10, Math.ceil(currentPage / 10) * 10)
+                        .map((page) => (
+                            <button
+                                key={page}
+                                onClick={() => handlePageChange(page)}
+                                className={page === currentPage ? 'currentPage' : ''}
+                            >
+                                {page}
+                            </button>
+                        ))}
+                    <button onClick={() => handlePageChange(currentPage + 10)}>{'...'}</button> {/* 다음 페이지 묶음 */}
+                    <button onClick={() => handlePageChange(currentPage + 1)}>{'>'}</button> {/* 다음 페이지 */}
+                    <button onClick={() => handlePageChange(totalPages)}>{'>>'}</button> {/* 마지막 페이지 */}
+                </div>
             </div>
             <div className="tabs">
                 <button
@@ -296,8 +343,8 @@ function TabComponent() {
                     이벤트 등록
                 </button>
                 <button
-                    className={`tab ${activeTab === 'advertising_company' ? 'active' : ''}`}
-                    onClick={() => handleTabChange('advertising_company')}
+                    className={`tab ${activeTab === 'advertising_companies' ? 'active' : ''}`}
+                    onClick={() => handleTabChange('advertising_companies')}
                 >
                     매체 등록
                 </button>
@@ -358,7 +405,7 @@ function TabComponent() {
                     flex-direction: row;
                     justify-content: space-between;
                     width: 100%;
-                    margin-bottom: 50px;
+                    margin-bottom: 25px;
                 }
                 .listTitle {
                     color: #343434;
@@ -422,6 +469,9 @@ function TabComponent() {
                     text-align: left;
                     font-size: 14px;
                 }
+                .data-table td {
+                    height: 60px;
+                }
                 .data-table th {
                     background-color: #ededed;
                     font-weight: 600;
@@ -464,6 +514,7 @@ function TabComponent() {
                     font-weight: 700;
                     line-height: normal;
                     border: none;
+                    margin: 14px 2px;
                 }
                 .editInputColor {
                     color: #cfcfcf;
@@ -485,6 +536,33 @@ function TabComponent() {
                         width: 100%;
                         padding: 0 20px;
                     }
+                }
+                 {
+                    /* 페이지 네이션  */
+                }
+                .pagination {
+                    display: flex;
+                    justify-content: center;
+                    margin-top: 20px;
+                }
+
+                .pagination button {
+                    margin: 0 5px;
+                    padding: 5px 10px;
+                    border: 1px solid #ccc;
+                    background-color: #fff;
+                    cursor: pointer;
+                    color: #999;
+                }
+
+                .pagination button.currentPage {
+                    font-weight: bold;
+                    color: #000;
+                    text-decoration: underline;
+                }
+
+                .pagination button:hover {
+                    background-color: #f0f0f0;
                 }
             `}</style>
         </div>
