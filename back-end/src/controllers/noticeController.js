@@ -8,11 +8,30 @@ const {
   deleteNotice,
 } = require("../models/noticeModel");
 
+// 공지사항 조회 컨트롤러
 const getNoticesController = async (req, res) => {
+  const {
+    page = 1,
+    searchQuery = "",
+    searchTypes = [], // 배열로 받음
+    startDate = "",
+    endDate = "",
+  } = req.query;
+
   try {
-    const notices = await getNotices();
+    // getNotices 함수에 페이지 번호와 필터를 전달
+    const { notices, totalPages } = await getNotices(
+      parseInt(page), // 페이지 번호
+      searchQuery, // 검색어
+      searchTypes, // 검색 구분 배열
+      startDate, // 시작 날짜
+      endDate // 종료 날짜
+    );
+
     res.status(200).json({
-      notices, // 전체 공지사항 배열 반환
+      noticeNotices: notices.noticeNotices, // NOTICE 공지사항
+      generalNotices: notices.generalNotices, // 페이지네이션 적용된 GENERAL 게시글
+      totalPages, // GENERAL 게시글에 대한 총 페이지 수 반환
     });
   } catch (error) {
     console.error("Server error:", error);
@@ -41,7 +60,7 @@ const getNoticeByIdController = async (req, res) => {
 };
 
 const createNoticeController = async (req, res) => {
-  const { title, content, type, author_id } = req.body;
+  const { title, content, type, author_id = 2 } = req.body;
   console.log(title, content, type, author_id);
   try {
     const newNotice = await createNotice({ title, content, type, author_id });
