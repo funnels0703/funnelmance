@@ -2,13 +2,17 @@ import React, { useState } from 'react';
 
 function CustomDropdown({ status, onChange }) {
     const [isOpen, setIsOpen] = useState(false);
-    const [selectedOption, setSelectedOption] = useState(status);
+    const [selectedOption, setSelectedOption] = useState(status === 1 ? '진행 중' : '종료');
 
-    const options = ['진행 중', '종료'];
+    console.log(status);
+    const options = [
+        { label: '진행 중', value: 1 },
+        { label: '종료', value: 2 },
+    ];
 
     const handleOptionClick = (option) => {
-        setSelectedOption(option);
-        onChange(option); // 상위 컴포넌트에 값 전달
+        setSelectedOption(option.label);
+        onChange(option.value); // 값(1 또는 2)을 상위 컴포넌트에 전달
         setIsOpen(false); // 드롭다운 닫기
     };
 
@@ -20,13 +24,13 @@ function CustomDropdown({ status, onChange }) {
             </div>
             {isOpen && (
                 <div className="dropdown-options">
-                    {options.map((option, index) => (
+                    {options.map((option) => (
                         <div
-                            key={index}
-                            className={`dropdown-option ${selectedOption === option ? 'selected' : ''}`}
+                            key={option.value}
+                            className={`dropdown-option ${selectedOption === option.label ? 'selected' : ''}`}
                             onClick={() => handleOptionClick(option)}
                         >
-                            {option}
+                            {option.label}
                         </div>
                     ))}
                 </div>

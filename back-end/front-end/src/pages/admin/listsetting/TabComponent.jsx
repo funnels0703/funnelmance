@@ -29,7 +29,15 @@ function TabComponent() {
         };
         try {
             const response = await axios.get(`${urls[activeTab]}?page=${currentPage}&limit=${itemsPerPage}`);
-            setData(response.data.items.map((item) => ({ ...item, edit: false })));
+
+            // status 값에 따라 "진행 중", "종료"로 변환
+            const transformedData = response.data.items.map((item) => ({
+                ...item,
+                status: item.status === 1 ? '진행 중' : item.status === 2 ? '종료' : '알 수 없음', // 추가적인 상태에 대한 기본 처리
+                edit: false,
+            }));
+
+            setData(transformedData);
             setTotalPages(response.data.totalPages); // 서버에서 받은 전체 페이지 수
             setCurrentPage(response.data.currentPage); // 서버에서 받은 현재 페이지
         } catch (error) {
@@ -52,9 +60,7 @@ function TabComponent() {
         const payload = activeTab === 'hospitals' ? { name, hospital_code } : { name };
         try {
             const response = await axios.post(url, payload);
-            // console.log('데이터가 성공적으로 추가되었습니다:', response.data);
-            // alert('데이터가 성공적으로 추가되었습니다.');
-            // setData((prev) => [...prev, { ...response.data, id: prev.length + 1000, edit: false }]);
+
             setName('');
             setHospital_code('');
             fetchData();
@@ -89,7 +95,7 @@ function TabComponent() {
 
         try {
             await axios.put(url, payload);
-            // alert('데이터가 성공적으로 업데이트되었습니다.');
+            fetchData();
             setEditableId(null);
         } catch (error) {
             console.error('데이터 업데이트 오류:', error);
