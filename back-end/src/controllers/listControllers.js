@@ -144,6 +144,57 @@ async function updateAdvertisingCompany(req, res) {
     }
 }
 
+// 병원 삭제
+async function deleteHospital(req, res) {
+    const { id } = req.params;
+    try {
+        const deletedHospital = await prisma.hospital_name.delete({
+            where: { id: parseInt(id) },
+        });
+        res.json(deletedHospital);
+    } catch (error) {
+        console.error('Error deleting hospital:', error);
+        if (error.code === 'P2025') {
+            return res.status(404).send('병원을 찾을 수 없습니다.');
+        }
+        res.status(500).send('서버 오류입니다.');
+    }
+}
+
+// 이벤트 삭제
+async function deleteEvent(req, res) {
+    const { id } = req.params;
+    try {
+        const deletedEvent = await prisma.event_name.delete({
+            where: { id: parseInt(id) },
+        });
+        res.json(deletedEvent);
+    } catch (error) {
+        console.error('Error deleting event:', error);
+        if (error.code === 'P2025') {
+            return res.status(404).send('이벤트를 찾을 수 없습니다.');
+        }
+        res.status(500).send('서버 오류입니다.');
+    }
+}
+
+// 매체 삭제
+async function deleteAdvertisingCompany(req, res) {
+    const { id } = req.params;
+    try {
+        const deletedAdvertisingCompany = await prisma.advertising_company.delete({
+            where: { id: parseInt(id) },
+        });
+        res.json(deletedAdvertisingCompany);
+    } catch (error) {
+        console.error('Error deleting advertising company:', error);
+        if (error.code === 'P2025') {
+            return res.status(404).send('매체를 찾을 수 없습니다.');
+        }
+        res.status(500).send('서버 오류입니다.');
+    }
+}
+
 module.exports = {
     getHospitals,
     addHospital,
@@ -154,4 +205,7 @@ module.exports = {
     getAdvertisingCompanies,
     addAdvertisingCompany,
     updateAdvertisingCompany,
+    deleteHospital,
+    deleteEvent,
+    deleteAdvertisingCompany,
 };
