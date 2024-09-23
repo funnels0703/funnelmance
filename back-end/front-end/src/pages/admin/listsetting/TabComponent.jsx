@@ -91,6 +91,28 @@ function TabComponent() {
         );
     };
 
+    // 삭제기능
+    const handleDelete = async () => {
+        if (selectedIds.length === 0) {
+            alert('삭제할 항목을 선택하세요.');
+            return;
+        }
+
+        const confirmDelete = window.confirm('선택한 항목을 삭제하시겠습니까?');
+        if (!confirmDelete) return;
+
+        try {
+            await Promise.all(selectedIds.map((id) => axios.delete(`/api/list/${activeTab}/${id}`)));
+            alert('선택한 항목이 성공적으로 삭제되었습니다.');
+            // 삭제 후 데이터 새로고침
+            fetchData();
+            setSelectedIds([]); // 선택된 항목 초기화
+        } catch (error) {
+            console.error('삭제 오류:', error);
+            alert('삭제하는 동안 오류가 발생했습니다.');
+        }
+    };
+
     return (
         <div className="listContainer container_flex">
             <div className="TabSetting container_left">
@@ -163,7 +185,9 @@ function TabComponent() {
                             : ''}{' '}
                         리스트
                     </h2>
-                    <button className="listDeleteBTN">삭제</button>
+                    <button className="listDeleteBTN" onClick={handleDelete}>
+                        삭제
+                    </button>
                 </div>
 
                 <table className="data-table">
