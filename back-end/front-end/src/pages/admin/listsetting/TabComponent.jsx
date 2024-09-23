@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import TitleBox from '../../../components/TitleBox';
 import CustomDropdown from './CustomDropdown';
+import DeleteBox from './DeleteBox'; // DeleteBox 컴포넌트 임포트
 
 function TabComponent() {
     const [activeTab, setActiveTab] = useState('hospitals');
@@ -10,6 +11,7 @@ function TabComponent() {
     const [data, setData] = useState([]);
     const [editableId, setEditableId] = useState(null);
     const [selectedIds, setSelectedIds] = useState([]); // 선택된 항목을 저장하는 상태 추가
+    const [showDeleteBox, setShowDeleteBox] = useState(false); // 모달 표시 여부
 
     const [currentPage, setCurrentPage] = useState(1); // 현재 페이지
     const [totalPages, setTotalPages] = useState(1); // 전체 페이지 수
@@ -50,14 +52,20 @@ function TabComponent() {
         const payload = activeTab === 'hospitals' ? { name, hospital_code } : { name };
         try {
             const response = await axios.post(url, payload);
-            console.log('데이터가 성공적으로 추가되었습니다:', response.data);
-            alert('데이터가 성공적으로 추가되었습니다.');
-            setData((prev) => [...prev, { ...response.data, id: prev.length + 1000, edit: false }]);
+            // console.log('데이터가 성공적으로 추가되었습니다:', response.data);
+            // alert('데이터가 성공적으로 추가되었습니다.');
+            // setData((prev) => [...prev, { ...response.data, id: prev.length + 1000, edit: false }]);
             setName('');
             setHospital_code('');
+            fetchData();
         } catch (error) {
-            console.error('데이터 추가 오류:', error);
-            alert('데이터 추가에 실패했습니다.');
+            if (error.response && error.response.status === 405) {
+                // 병원 코드 중복 에러 처리
+                alert('이미 존재하는 병원 코드입니다.');
+            } else {
+                console.error('데이터 추가 오류:', error);
+                alert('데이터 추가에 실패했습니다.');
+            }
         }
     };
 
@@ -81,7 +89,7 @@ function TabComponent() {
 
         try {
             await axios.put(url, payload);
-            alert('데이터가 성공적으로 업데이트되었습니다.');
+            // alert('데이터가 성공적으로 업데이트되었습니다.');
             setEditableId(null);
         } catch (error) {
             console.error('데이터 업데이트 오류:', error);
@@ -100,34 +108,44 @@ function TabComponent() {
     };
 
     // 삭제기능
-    const handleDelete = async () => {
+
+    // 삭제 버튼 클릭 시 모달을 띄우는 함수
+    const handleDeleteClick = () => {
         if (selectedIds.length === 0) {
             alert('삭제할 항목을 선택하세요.');
             return;
         }
+        setShowDeleteBox(true); // 모달을 띄움
+    };
 
-        const confirmDelete = window.confirm('선택한 항목을 삭제하시겠습니까?');
-        if (!confirmDelete) return;
-
+    // 모달에서 확인 눌렀을 때 삭제 처리
+    const handleConfirmDelete = async () => {
         try {
             await Promise.all(selectedIds.map((id) => axios.delete(`/api/list/${activeTab}/${id}`)));
-            alert('선택한 항목이 성공적으로 삭제되었습니다.');
-            // 삭제 후 데이터 새로고침
-            fetchData();
+            // alert('선택한 항목이 성공적으로 삭제되었습니다.');
+            fetchData(); // 데이터 새로고침
             setSelectedIds([]); // 선택된 항목 초기화
         } catch (error) {
             console.error('삭제 오류:', error);
             alert('삭제하는 동안 오류가 발생했습니다.');
+        } finally {
+            setShowDeleteBox(false); // 모달 닫기
         }
     };
 
+    // 모달에서 취소 버튼을 눌렀을 때 모달 닫기
+    const handleCancelDelete = () => {
+        setShowDeleteBox(false); // 모달 닫기
+    };
     // ----------------------------------- 페이지 네이션
     const handlePageChange = (page) => {
         if (page >= 1 && page <= totalPages) {
             setCurrentPage(page); // 페이지 변경
         }
     };
-
+    const deleteMessage = `현재 선택한 ${
+        activeTab === 'hospitals' ? '병원을' : activeTab === 'events' ? '이벤트를' : '매체를'
+    } 정말 삭제하시겠습니까?`;
     return (
         <div className="listContainer container_flex">
             <div className="TabSetting container_left">
@@ -200,7 +218,7 @@ function TabComponent() {
                             : ''}{' '}
                         리스트
                     </h2>
-                    <button className="listDeleteBTN" onClick={handleDelete}>
+                    <button className="listDeleteBTN" onClick={handleDeleteClick}>
                         삭제
                     </button>
                 </div>
@@ -231,13 +249,13 @@ function TabComponent() {
                     </thead>
                     <tbody>
                         {data.map((item) => (
-                            <tr
-                                key={item.id}
-                                className={selectedIds.includes(item.id) ? 'selected' : ''} // 선택된 항목에 클래스 추가
-                                onClick={() => handleSelect(item.id)} // 선택 처리
-                            >
+                            <tr key={item.id} className={selectedIds.includes(item.id) ? 'selected' : ''}>
                                 <td style={{ textAlign: 'center' }}>
-                                    <input type="checkbox" checked={selectedIds.includes(item.id)} readOnly />
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedIds.includes(item.id)}
+                                        onChange={() => handleSelect(item.id)} // 체크박스에서 선택 처리
+                                    />
                                 </td>
                                 {activeTab === 'hospitals' && (
                                     <td className={`${item.status === '종료' ? 'editInputColor' : ''}`}>
@@ -328,6 +346,9 @@ function TabComponent() {
                     <button onClick={() => handlePageChange(currentPage + 1)}>{'>'}</button> {/* 다음 페이지 */}
                     <button onClick={() => handlePageChange(totalPages)}>{'>>'}</button> {/* 마지막 페이지 */}
                 </div>
+                {showDeleteBox && (
+                    <DeleteBox message={deleteMessage} onCancel={handleCancelDelete} onConfirm={handleConfirmDelete} />
+                )}
             </div>
             <div className="tabs">
                 <button

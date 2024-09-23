@@ -14,6 +14,9 @@ async function getHospitals(req, res) {
         const hospitals = await prisma.hospital_name.findMany({
             skip: (pageInt - 1) * limitInt, // 페이지네이션 적용: 건너뛸 항목 수
             take: limitInt, // 페이지당 가져올 항목 수
+            orderBy: {
+                id: 'desc', // ID를 기준으로 내림차순 정렬
+            },
         });
 
         res.json({
@@ -30,13 +33,30 @@ async function getHospitals(req, res) {
 // 병원 추가
 async function addHospital(req, res) {
     const { name, status, hospital_code } = req.body;
+
+    // 필수 값 확인
     if (!name) {
         return res.status(400).send('병원 이름은 필수입니다.');
     }
+    if (!hospital_code) {
+        return res.status(400).send('병원 코드는 필수입니다.');
+    }
+
     try {
+        // hospital_code가 이미 존재하는지 확인
+        const existingHospital = await prisma.hospital_name.findFirst({
+            where: { hospital_code },
+        });
+
+        if (existingHospital) {
+            return res.status(405).send('이미 존재하는 병원 코드입니다.'); // 405 상태 코드로 반환
+        }
+
+        // 병원 추가
         const newHospital = await prisma.hospital_name.create({
             data: { name, status, hospital_code },
         });
+
         res.status(201).json(newHospital);
     } catch (error) {
         console.error('Error adding hospital:', error);
@@ -57,6 +77,9 @@ async function getEvents(req, res) {
         const events = await prisma.event_name.findMany({
             skip: (pageInt - 1) * limitInt,
             take: limitInt,
+            orderBy: {
+                id: 'desc', // ID를 기준으로 내림차순 정렬
+            },
         });
 
         res.json({
@@ -100,6 +123,9 @@ async function getAdvertisingCompanies(req, res) {
         const advertisingCompanies = await prisma.advertising_company.findMany({
             skip: (pageInt - 1) * limitInt,
             take: limitInt,
+            orderBy: {
+                id: 'desc', // ID를 기준으로 내림차순 정렬
+            },
         });
 
         res.json({
