@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import TitleBox from '../../../components/TitleBox';
+import CustomDropdown from './CustomDropdown';
 
 function TabComponent() {
     const [activeTab, setActiveTab] = useState('hospitals');
     const [name, setName] = useState('');
-    const [hospital_code, setHospital_code] = useState(''); // 담당자 이름 상태 추가
+    const [hospital_code, setHospital_code] = useState('');
     const [data, setData] = useState([]);
     const [editableId, setEditableId] = useState(null);
+    const [selectedIds, setSelectedIds] = useState([]); // 선택된 항목을 저장하는 상태 추가
 
     useEffect(() => {
         fetchData();
@@ -58,15 +60,35 @@ function TabComponent() {
     const handleUpdate = async (id) => {
         const item = data.find((item) => item.id === id);
         if (!item) return;
+
         const url = `/api/list/${activeTab}/${id}`;
+
+        // 병원 코드와 담당자 정보를 포함하여 PUT 요청을 보냄
+        const payload = {
+            name: item.name,
+            status: item.status,
+            hospital_code: item.hospital_code, // 병원 코드 추가
+            manager: item.manager, // 담당자 추가
+        };
+
         try {
-            await axios.put(url, { name: item.name, status: item.status });
+            await axios.put(url, payload);
             alert('데이터가 성공적으로 업데이트되었습니다.');
             setEditableId(null);
         } catch (error) {
             console.error('데이터 업데이트 오류:', error);
             alert('데이터 업데이트에 실패했습니다.');
         }
+    };
+
+    // 선택 처리 핸들러
+    const handleSelect = (id) => {
+        setSelectedIds(
+            (prevSelected) =>
+                prevSelected.includes(id)
+                    ? prevSelected.filter((selectedId) => selectedId !== id) // 이미 선택된 경우 제거
+                    : [...prevSelected, id] // 선택되지 않은 경우 추가
+        );
     };
 
     return (
@@ -130,54 +152,77 @@ function TabComponent() {
                         ? '이벤트 등록하기'
                         : '매체 등록하기'}
                 </button>
+                <div className="listTitleHeader">
+                    <h2 className="listTitle">
+                        {activeTab === 'hospitals'
+                            ? '병원'
+                            : activeTab === 'events'
+                            ? '이벤트'
+                            : activeTab === 'advertising_company'
+                            ? '매체'
+                            : ''}{' '}
+                        리스트
+                    </h2>
+                    <button className="listDeleteBTN">삭제</button>
+                </div>
+
                 <table className="data-table">
                     <thead>
                         <tr>
-                            <th>선택</th>
-                            {activeTab === 'hospitals' && <th>병원코드</th>}
-                            <th>병원이름</th>
-                            <th>진행/종료</th>
-                            {activeTab === 'hospitals' && <th>담당자</th>}
-                            <th>상태</th>
+                            <th style={{ textAlign: 'center', width: '8%' }}>선택</th>
+                            {activeTab === 'hospitals' && <th style={{ width: '12%' }}>병원코드</th>}
+                            <th style={{ width: '20%' }}>병원이름</th>
+                            <th style={{ paddingLeft: '20px', width: '18%' }}>진행/종료</th>
+                            {activeTab === 'hospitals' && <th style={{ width: '20%' }}>담당자</th>}
+                            <th style={{ width: '8%' }}>상태</th>
                         </tr>
                     </thead>
                     <tbody>
                         {data.map((item) => (
-                            <tr key={item.id}>
-                                <td>
-                                    <input type="checkbox" />
-                                </td>
-                                {activeTab === 'hospitals' && <td>{item.hospital_code || '코드 없음'}</td>}
-                                <td>
-                                    <input
-                                        type="text"
-                                        value={item.name}
-                                        onChange={(e) => {
-                                            const newData = data.map((x) =>
-                                                x.id === item.id ? { ...x, name: e.target.value } : x
-                                            );
-                                            setData(newData);
-                                        }}
-                                        disabled={editableId !== item.id}
-                                    />
-                                </td>
-                                <td>
-                                    <select
-                                        value={item.status}
-                                        onChange={(e) => {
-                                            const newData = data.map((x) =>
-                                                x.id === item.id ? { ...x, status: e.target.value } : x
-                                            );
-                                            setData(newData);
-                                        }}
-                                        disabled={editableId !== item.id}
-                                    >
-                                        <option value="진행 중">진행 중</option>
-                                        <option value="종료">종료</option>
-                                    </select>
+                            <tr
+                                key={item.id}
+                                className={selectedIds.includes(item.id) ? 'selected' : ''} // 선택된 항목에 클래스 추가
+                                onClick={() => handleSelect(item.id)} // 선택 처리
+                            >
+                                <td style={{ textAlign: 'center' }}>
+                                    <input type="checkbox" checked={selectedIds.includes(item.id)} readOnly />
                                 </td>
                                 {activeTab === 'hospitals' && (
-                                    <td>
+                                    <td className={`${item.status === '종료' ? 'editInputColor' : ''}`}>
+                                        <input
+                                            type="text"
+                                            value={item.hospital_code || ''}
+                                            onChange={(e) => {
+                                                const newData = data.map((x) =>
+                                                    x.id === item.id ? { ...x, hospital_code: e.target.value } : x
+                                                );
+                                                setData(newData); // 상태를 업데이트하여 value가 변하도록 설정
+                                            }}
+                                            disabled={editableId !== item.id}
+                                            className={`${editableId === item.id ? 'editInputColor' : ''}`}
+                                        />
+                                    </td>
+                                )}
+
+                                <td className={`${item.status === '종료' ? 'editInputColor' : ''}`}>{item.name}</td>
+                                <td className={`${item.status === '종료' ? 'editInputColor' : ''}`}>
+                                    {editableId === item.id ? (
+                                        <CustomDropdown
+                                            status={item.status}
+                                            onChange={(newStatus) => {
+                                                const newData = data.map((x) =>
+                                                    x.id === item.id ? { ...x, status: newStatus } : x
+                                                );
+                                                setData(newData);
+                                            }}
+                                        />
+                                    ) : (
+                                        <span className="normalSpan">{item.status}</span>
+                                    )}
+                                </td>
+
+                                {activeTab === 'hospitals' && (
+                                    <td className={`${item.status === '종료' ? 'editInputColor' : ''}`}>
                                         <input
                                             type="text"
                                             value={item.manager || ''}
@@ -187,16 +232,25 @@ function TabComponent() {
                                                 );
                                                 setData(newData);
                                             }}
-                                            disabled={editableId !== item.id}
+                                            disabled={editableId !== item.id} // 담당자 필드는 수정 가능
+                                            className={`${editableId === item.id ? 'editInputColor' : ''}`}
                                         />
                                     </td>
                                 )}
-
-                                <td>
+                                <td className={`${item.status === '종료' ? 'editInputColor' : ''}`}>
                                     {editableId === item.id ? (
-                                        <button onClick={() => handleUpdate(item.id)}>저장</button>
+                                        <button className="listSaveBTN" onClick={() => handleUpdate(item.id)}>
+                                            저장
+                                        </button>
                                     ) : (
-                                        <button onClick={() => handleEdit(item.id)}>수정</button>
+                                        <button
+                                            className={`${
+                                                item.status === '종료' ? 'listSaveBTN editInputColor' : 'listSaveBTN'
+                                            }`}
+                                            onClick={() => handleEdit(item.id)}
+                                        >
+                                            수정
+                                        </button>
                                     )}
                                 </td>
                             </tr>
@@ -258,7 +312,45 @@ function TabComponent() {
                     background-color: #003181;
                     color: #ffffff;
                 }
+                .listPostBtn {
+                    width: 240px;
+                    height: 50px;
+                    margin: 0 auto;
+                    align-items: center;
+                    background-color: #4880ff;
+                    color: white;
+                    text-align: center;
+                    font-size: 16px;
+                    font-style: normal;
+                    font-weight: 500;
+                    line-height: normal;
+                    border: none;
+                    border-radius: 5px;
+                    margin-top: 25px;
+                }
 
+                .listTitleHeader {
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-between;
+                    width: 100%;
+                    margin-bottom: 50px;
+                }
+                .listTitle {
+                    color: #343434;
+                    font-size: 20px;
+                    font-weight: 700;
+                    line-height: 50px;
+                }
+                .listDeleteBTN {
+                    border-radius: 5px;
+                    border: 1px solid #f00;
+                    color: #ea0234;
+                    font-size: 16px;
+                    width: 101px;
+                    height: 50px;
+                    background-color: #fff;
+                }
                 .postForm {
                     display: flex;
                     flex-direction: row;
@@ -284,6 +376,7 @@ function TabComponent() {
                     padding: 0 21px;
                     font-size: 16px;
                     line-height: 50px;
+                    text-align: left;
                 }
                 .longInput {
                     width: 44.41vw;
@@ -291,21 +384,7 @@ function TabComponent() {
                 .longInput2 {
                     width: 45.13vw;
                 }
-                .listPostBtn {
-                    width: 240px;
-                    height: 50px;
-                    margin: 0 auto;
-                    align-items: center;
-                    background-color: #4880ff;
-                    color: white;
-                    text-align: center;
-                    font-size: 16px;
-                    font-style: normal;
-                    font-weight: 500;
-                    line-height: normal;
-                    border: none;
-                    border-radius: 5px;
-                }
+
                  {
                     /* ------------------------------------------------- */
                 }
@@ -316,21 +395,60 @@ function TabComponent() {
                 }
                 .data-table th,
                 .data-table td {
-                    border: 1px solid #ddd;
-                    padding: 12px;
                     text-align: left;
                     font-size: 14px;
                 }
                 .data-table th {
-                    background-color: #f1f1f1;
+                    background-color: #ededed;
                     font-weight: 600;
+                    text-align: left;
+                    padding: 16px 0 15px;
                 }
-                .data-table td {
-                    background-color: #fafafa;
-                    transition: background-color 0.3s;
+
+                .data-table input[type='checkbox'] {
+                    width: 17px;
+                    height: 17px;
                 }
-                .data-table td:hover {
-                    background-color: #f5f5f5;
+                .data-table input[type='text'] {
+                    width: 72px;
+                    height: 36px;
+                    padding: 9px;
+                    margin: 14px 2px;
+                    background-color: #d0eaff;
+                    border: 1px solid #979797;
+                    outline: none;
+                    text-align: center;
+                    color: rgba(32, 34, 36, 0.3);
+                    border-radius: 2px;
+                }
+
+                .editInputColor input,
+                .editInputColor button {
+                    background-color: #f8f4f4; /* input이나 button의 백그라운드 색상 */
+                }
+                .listSaveBTN {
+                    width: 54px;
+                    height: 27px;
+                    line-height: 27px;
+                    text-align: center;
+                    border-radius: 3px;
+                    background-color: rgba(72, 128, 255, 0.2);
+                    color: #4880ff;
+                    text-align: center;
+                    font-size: 12px;
+                    font-style: normal;
+                    font-weight: 700;
+                    line-height: normal;
+                    border: none;
+                }
+                .editInputColor {
+                    color: #cfcfcf;
+                }
+                .normalSpan {
+                    padding: 0 0 0 21px;
+                }
+                .selected {
+                    background-color: #d0eaff;
                 }
                 @media (max-width: 768px) {
                     .tabs {
