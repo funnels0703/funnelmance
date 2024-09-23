@@ -58,6 +58,11 @@ function SideMenu() {
     );
   };
 
+  // 로그인 페이지 여부 확인
+  const isLoginPage = location.pathname === "/login";
+
+  if (isLoginPage) return null; // 로그인 페이지면 SideMenu를 렌더링하지 않음
+
   return (
     <nav>
       <ul className="main_menu">

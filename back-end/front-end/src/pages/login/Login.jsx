@@ -7,6 +7,7 @@ function Login() {
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false); // 로그인 상태 유지 체크박스 상태
 
   const handleLogin = async () => {
     try {
@@ -15,7 +16,13 @@ function Login() {
         password,
       });
       const { token } = response.data;
-      localStorage.setItem("token", token); // 로컬 스토리지에 토큰 저장
+
+      if (rememberMe) {
+        localStorage.setItem("token", token); // 체크박스가 선택되었을 때만 토큰 저장
+      } else {
+        sessionStorage.setItem("token", token); // 선택되지 않았을 때는 sessionStorage에 저장
+      }
+
       navigate("/db"); // 로그인 성공 후 '/db' 경로로 리디렉션합니다.
     } catch (error) {
       console.error("로그인 실패:", error.response?.data?.error || "서버 오류");
@@ -25,69 +32,95 @@ function Login() {
 
   return (
     <div className="login-container">
-      <h2>로그인</h2>
-      <div className="input-group">
-        <label htmlFor="username">아이디</label>
+      <h2>
+        <img src="/images/logo.png" alt="퍼널스" />
+      </h2>
+      <input
+        type="text"
+        id="username"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+        required
+        placeholder="아이디"
+      />
+      <input
+        type="password"
+        id="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        required
+        placeholder="비밀번호"
+      />
+
+      <label className="remember_me">
         <input
-          type="text"
-          id="username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          required
+          type="checkbox"
+          id="rememberMe"
+          checked={rememberMe}
+          onChange={() => setRememberMe(!rememberMe)} // 체크박스 상태 변경
         />
-      </div>
-      <div className="input-group">
-        <label htmlFor="password">비밀번호</label>
-        <input
-          type="password"
-          id="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-      </div>
+        로그인 상태 유지
+      </label>
+
       <button onClick={handleLogin}>로그인</button>
+
+      <p className="copyright">
+        Copyright © Funnel Solution All Rights Reserved.
+      </p>
       <style jsx>{`
         .login-container {
-          max-width: 400px;
+          width: 380px;
           margin: 50px auto;
           padding: 20px;
-          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-          border-radius: 8px;
           text-align: center;
-          background-color: #f9f9f9;
-        }
-        h2 {
-          color: #333;
-        }
-        .input-group {
-          margin-bottom: 20px;
-        }
-        label {
-          display: block;
-          margin-bottom: 5px;
-          font-size: 16px;
-          color: #666;
-        }
-        input {
-          width: calc(100% - 20px);
-          padding: 10px;
-          font-size: 14px;
-          border-radius: 4px;
-          border: 1px solid #ddd;
-        }
-        button {
-          width: 100%;
-          padding: 10px;
-          border: none;
-          border-radius: 4px;
-          background-color: #0056b3;
-          color: white;
-          font-size: 16px;
-          cursor: pointer;
-        }
-        button:hover {
-          background-color: #004494;
+          h2 {
+            margin-bottom: 42px;
+          }
+          > input {
+            width: 100%;
+            height: 50px;
+            padding: 0 18px;
+            font-size: 14px;
+            border-radius: 5px;
+            border: 1px solid #d9d9d9;
+            margin-bottom: 20px;
+            color: #818181;
+            font-weight: 500;
+          }
+          .remember_me {
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            color: #999;
+            font-size: 14px;
+            display: flex;
+            input {
+              margin-right: 4px;
+              border-radius: 2px;
+              border: 1px solid #e0e0e0;
+            }
+          }
+          button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #0056b3;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+          }
+          button:hover {
+            background-color: #004494;
+          }
+          .copyright {
+            color: #999;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 500;
+            margin-top: 26px;
+          }
         }
       `}</style>
     </div>
