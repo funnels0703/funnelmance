@@ -76,7 +76,7 @@ model funnels_db {
 model hospital_name {
   id                                                                Int                @id @default(autoincrement())
   name                                                              String             @db.VarChar(255)
-  status                                                            String?            @default("활성화") @db.VarChar(50)
+  status                                                            Int?               @default(1)
   url_code_setting_id                                               Int?
   manager                                                           String?            @db.VarChar(60)
   hospital_code                                                     String             @db.VarChar(60)
