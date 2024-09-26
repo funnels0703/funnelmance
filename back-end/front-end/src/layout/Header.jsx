@@ -1,6 +1,8 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom"; //
 function Header() {
+  const navigate = useNavigate();
   const userId = "이재연";
   const userColor = "#4C61CC";
   const displayUserId = userId.slice(0, 2).toUpperCase();
@@ -8,6 +10,18 @@ function Header() {
   const location = useLocation();
   // 로그인 페이지 여부 확인
   const isLoginPage = location.pathname === "/login";
+
+  const handleLogout = () => {
+    // localStorage에서 토큰 삭제
+    localStorage.removeItem("token");
+
+    // sessionStorage에서 토큰 삭제
+    sessionStorage.removeItem("token");
+
+    // 추가적으로 로그아웃 후 이동할 경로를 지정할 수 있습니다.
+    navigate("/login"); // 예: 로그인 페이지로 리디렉션
+  };
+
   return (
     <header>
       <div className="logo">
@@ -17,7 +31,7 @@ function Header() {
 
       {!isLoginPage && (
         <div className="profile">
-          <div className="sign_out">
+          <div className="sign_out" onClick={handleLogout}>
             <Link to="/login">
               <img src="/images/header/sign-out.png" alt="로그아웃" />
             </Link>
