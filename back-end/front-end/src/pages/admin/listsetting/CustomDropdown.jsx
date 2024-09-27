@@ -1,27 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-function CustomDropdown({ status, onChange }) {
+function CustomDropdown({ selectedValue, options, onChange }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedOption, setSelectedOption] = useState(
-    status === 1 ? "진행 중" : "종료"
-  );
+  const [selectedOption, setSelectedOption] = useState("");
 
-  console.log(status);
-  const options = [
-    { label: "진행 중", value: 1 },
-    { label: "종료", value: 2 },
-  ];
+  // selectedValue와 options를 기반으로 selectedOption 초기화
+  useEffect(() => {
+    // selectedValue와 일치하는 옵션을 찾아서 설정
+    const currentOption = options.find(
+      (option) => option.label === selectedValue
+    );
+    if (currentOption) {
+      setSelectedOption(currentOption.label);
+    }
+  }, [selectedValue, options]);
 
   const handleOptionClick = (option) => {
     setSelectedOption(option.label);
-    onChange(option.value); // 값(1 또는 2)을 상위 컴포넌트에 전달
+    onChange(option.value); // 선택된 값을 상위 컴포넌트로 전달
     setIsOpen(false); // 드롭다운 닫기
   };
 
   return (
     <div className="dropdown">
       <div className="dropdown-header" onClick={() => setIsOpen(!isOpen)}>
-        {selectedOption || "진행/종료"}
+        {selectedOption || "선택"}
         <span className={`dropdown-arrow ${isOpen ? "open" : ""}`}></span>
       </div>
       {isOpen && (
@@ -30,7 +33,7 @@ function CustomDropdown({ status, onChange }) {
             <div
               key={option.value}
               className={`dropdown-option ${
-                selectedOption === option.label ? "selected" : ""
+                option.label === selectedOption ? "selected" : ""
               }`}
               onClick={() => handleOptionClick(option)}
             >

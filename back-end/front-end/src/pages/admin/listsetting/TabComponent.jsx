@@ -167,6 +167,19 @@ function TabComponent() {
       ? "이벤트를"
       : "매체를"
   } 정말 삭제하시겠습니까?`;
+
+  const handleStatusChange = (id, newStatus) => {
+    const newData = data.map((item) =>
+      item.id === id ? { ...item, status: newStatus } : item
+    );
+    setData(newData);
+  };
+
+  const statusOptions = [
+    { label: "진행 중", value: 1 },
+    { label: "종료", value: 2 },
+  ];
+
   return (
     <div className="listContainer container_flex">
       <div className="TabSetting container_left">
@@ -324,13 +337,11 @@ function TabComponent() {
                 >
                   {editableId === item.id ? (
                     <CustomDropdown
-                      status={item.status}
-                      onChange={(newStatus) => {
-                        const newData = data.map((x) =>
-                          x.id === item.id ? { ...x, status: newStatus } : x
-                        );
-                        setData(newData);
-                      }}
+                      selectedValue={item.status}
+                      options={statusOptions}
+                      onChange={(newStatus) =>
+                        handleStatusChange(item.id, newStatus)
+                      }
                     />
                   ) : (
                     <span className="normalSpan">{item.status}</span>

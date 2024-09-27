@@ -1,0 +1,178 @@
+// CustomDropdown.jsx
+.dropdown {
+  position: relative;
+  width: 140px;
+  font-family: Arial, sans-serif;
+
+  .dropdown-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 36px;
+    line-height: 36px;
+    padding: 0 10px 0 21px;
+    border: 1px solid #4880ff;
+    border-radius: 4px;
+    background-color: white;
+    cursor: pointer;
+  }
+
+  .dropdown-arrow {
+    border: solid black;
+    border-width: 0 1px 1px 0;
+    display: inline-block;
+    padding: 4px;
+    transform: rotate(45deg);
+    margin: 0px 7px 6px;
+  }
+
+  .dropdown-options {
+    position: absolute;
+    top: 105%;
+    left: 0;
+    width: 100%;
+    border: 1px solid #4880ff;
+    border-radius: 4px;
+    background-color: white;
+    max-height: 150px;
+    overflow-y: auto;
+    z-index: 100;
+  }
+
+  .dropdown-option {
+    height: 25px;
+    line-height: 25px;
+    padding: 0 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #f1f1f1;
+    text-align: center;
+    color: #979797;
+    font-size: 12px;
+  }
+
+  .dropdown-option.selected {
+    background-color: #4880ff;
+    color: white;
+  }
+
+  .dropdown-option:last-child {
+    border-bottom: none;
+  }
+}
+// UserManagement.jsx
+.user_container {
+  .user-form {
+    margin-bottom: 50px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 20px 4%;
+    button {
+      width: 240px;
+      height: 50px;
+      font-size: 16px;
+      font-weight: 500;
+      border-radius: 5px;
+      background: #4880ff;
+      color: white;
+      border: none;
+    }
+
+    button:hover {
+      background-color: #3672d9;
+    }
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 48%;
+  }
+  .form-group input[type="text"],
+  .form-group input[type="password"],
+  .form-group select {
+    width: 380px;
+    height: 50px;
+    font-size: 16px;
+    font-weight: 300;
+    color: #202224;
+    border-radius: 10px;
+    border: 1px solid #d9d9d9;
+    padding: 15px 20px;
+    &:focus {
+      border: 1px solid #4880ff;
+      outline: none;
+    }
+    &.editing {
+      border: 1px solid #979797;
+      background: rgba(208, 234, 255, 1);
+    }
+  }
+
+  > h2 {
+    color: #343434;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 50px;
+    float: left;
+    margin-bottom: 50px;
+  }
+  > button {
+    border-radius: 5px;
+    border: 1px solid #f00;
+    color: #ea0234;
+    font-size: 16px;
+    width: 101px;
+    height: 50px;
+    background-color: #fff;
+    float: right;
+  }
+  .user-table {
+    width: 100%;
+    border-collapse: collapse;
+    tr {
+      &.selected {
+        background: #d0eaff;
+      }
+    }
+    th {
+      background: #ededed;
+      color: #202224;
+      font-size: 14px;
+      font-weight: 500;
+      height: 48px;
+      text-align: left;
+    }
+    td {
+      border-bottom: 1px solid rgba(151, 151, 151, 0.6);
+      height: 65px;
+      font-size: 14px;
+    }
+    th:nth-of-type(1),
+    td:nth-of-type(1) {
+      text-align: center;
+    }
+  }
+
+  .user-table td input,
+  .user-table td select {
+    padding: 6px;
+    font-size: 14px;
+  }
+  .user-table td button {
+    width: 54px;
+    height: 27px;
+    border-radius: 5px;
+    color: #4880ff;
+    font-size: 12px;
+    font-weight: 700;
+    background: rgba(72, 128, 255, 0.2);
+    border: none;
+  }
+  .user-table td button:hover {
+    background-color: #005bb5;
+  }
+}
