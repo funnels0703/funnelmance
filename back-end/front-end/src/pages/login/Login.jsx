@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom"; // useNavigate를 import합니다.
+import "./login.scss";
 
 function Login() {
   const navigate = useNavigate();
@@ -68,62 +69,6 @@ function Login() {
       <p className="copyright">
         Copyright © Funnel Solution All Rights Reserved.
       </p>
-      <style jsx>{`
-        .login-container {
-          width: 380px;
-          margin: 50px auto;
-          padding: 20px;
-          text-align: center;
-          h2 {
-            margin-bottom: 42px;
-          }
-          > input {
-            width: 100%;
-            height: 50px;
-            padding: 0 18px;
-            font-size: 14px;
-            border-radius: 5px;
-            border: 1px solid #d9d9d9;
-            margin-bottom: 20px;
-            color: #818181;
-            font-weight: 500;
-          }
-          .remember_me {
-            width: 100%;
-            text-align: left;
-            cursor: pointer;
-            color: #999;
-            font-size: 14px;
-            display: flex;
-            input {
-              margin-right: 4px;
-              border-radius: 2px;
-              border: 1px solid #e0e0e0;
-            }
-          }
-          button {
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 4px;
-            background-color: #0056b3;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 20px;
-          }
-          button:hover {
-            background-color: #004494;
-          }
-          .copyright {
-            color: #999;
-            text-align: center;
-            font-size: 12px;
-            font-weight: 500;
-            margin-top: 26px;
-          }
-        }
-      `}</style>
     </div>
   );
 }

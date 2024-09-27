@@ -4,6 +4,7 @@ import FilterComponent from "./FilterComponent";
 import AccordionComponent from "./AccordionComponent";
 import StatCard from "./StatCard";
 import DeleteButton from "./DeleteButton";
+import "./customordata.scss";
 
 function CustomorDataPage({ title, get_status, put_status }) {
   const [customors, setCustomors] = useState([]);
@@ -180,7 +181,7 @@ function CustomorDataPage({ title, get_status, put_status }) {
   console.log("companyOptions", companyOptions);
 
   return (
-    <div className="container">
+    <div className="DataContainer">
       {/* <h2>{title}</h2> */}
 
       {/* filters 상태와 handleFilterChange 함수를 FilterComponent에 전달 */}
@@ -400,169 +401,6 @@ function CustomorDataPage({ title, get_status, put_status }) {
           다음
         </button>
       </div>
-
-      <style jsx>{`
-        .container {
-          overflow-x: auto;
-          .itdependson {
-            display: flex;
-            flex-direction: row;
-          }
-          .userSetCompany {
-            display: flex;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-            flex-direction: row;
-          }
-          .cardMarginAdded {
-            margin-right: 19px;
-            width: 283px;
-            height: 200px;
-            background-color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-top: 8px solid #4880ff; /* 상단 파란색 보더 */
-            padding: 10px;
-            box-sizing: border-box;
-          }
-          .cardAllSet {
-            width: calc(100% - 283px);
-            height: 200px;
-            background-color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: start;
-            border-top: 8px solid #4880ff; /* 상단 파란색 보더 */
-            padding: 10px 10px 10px 30px;
-            box-sizing: border-box;
-            .stat-card {
-              width: 200px;
-            }
-          }
-          h2 {
-            margin-bottom: 20px;
-            text-align: center;
-          }
-
-          .permanent-delete {
-            margin-left: 10px;
-            padding: 10px 15px;
-            background-color: #6c757d;
-            color: white;
-            border: none;
-            cursor: pointer;
-          }
-
-          .permanent-delete:hover {
-            background-color: #5a6268;
-          }
-
-          .customor-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-          }
-
-          th,
-          td {
-            padding: 10px;
-            text-align: left;
-            color: #202224;
-            font-size: 14px;
-            font-style: normal;
-            font-weight: 500;
-            line-height: normal;
-          }
-
-          th {
-            background-color: #ededed;
-            padding: 16px 15px 15px;
-          }
-          td {
-            font-weight: 300;
-            padding: 27px 0 30px;
-            input {
-              width: calc(90% - 30px); /* width에서 10px을 뺍니다 */
-              padding: 5px 0px;
-              margin: 0px 15px;
-              box-sizing: border-box;
-            }
-
-            input:disabled {
-              border: none;
-              background-color: white;
-            }
-          }
-          .submit-button,
-          .edit-button {
-            background-color: #e0e4fc;
-            color: #4880ff;
-            text-align: center;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            padding: 6px 16px;
-            border: none;
-            border-radius: 3px;
-          }
-
-          .submit-button:hover,
-          .edit-button:hover {
-          }
-
-          .pagination {
-            display: flex;
-            justify-content: center;
-            margin: 20px 0;
-          }
-
-          .pagination button {
-            margin: 0 5px;
-            padding: 5px 10px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            cursor: pointer;
-          }
-
-          .pagination button:disabled {
-            background-color: #ddd;
-            cursor: not-allowed;
-          }
-
-          .media-buttons {
-            margin-bottom: 20px;
-            text-align: center;
-          }
-
-          .media-buttons button {
-            margin: 0 10px;
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-          }
-
-          .media-buttons button:hover {
-            background-color: #0056b3;
-          }
-
-          .card-container {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 20px;
-          }
-
-          .button-group {
-            margin: 20px 0;
-            text-align: center;
-          }
-        }
-      `}</style>
     </div>
   );
 }

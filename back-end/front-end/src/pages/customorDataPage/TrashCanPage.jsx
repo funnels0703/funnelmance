@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import "./customordata.scss";
 
 function TrashcanPage() {
   const [deletedCustomors, setDeletedCustomors] = useState([]);
@@ -38,7 +39,7 @@ function TrashcanPage() {
   }
 
   return (
-    <div className="container">
+    <div className="TrashContainer">
       <h2>삭제된 고객 데이터</h2>
       <p style={{ color: "red", fontWeight: "bold" }}>데이터 수정 중</p>
       <table className="customor-table">
@@ -103,35 +104,6 @@ function TrashcanPage() {
           ))}
         </tbody>
       </table>
-
-      <style jsx>{`
-        .container {
-          padding: 20px;
-          max-width: 100%;
-          overflow-x: auto;
-        }
-
-        h2 {
-          margin-bottom: 20px;
-          text-align: center;
-        }
-
-        .customor-table {
-          width: 100%;
-          border-collapse: collapse;
-        }
-
-        th,
-        td {
-          border: 1px solid #ccc;
-          padding: 10px;
-          text-align: left;
-        }
-
-        th {
-          background-color: #eee;
-        }
-      `}</style>
     </div>
   );
 }
