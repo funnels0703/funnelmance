@@ -9,8 +9,9 @@ const createUser = async (userData) => {
     username,
     password,
     name,
-    role = "USER",
+    role,
     is_active = true,
+    hospital_name_id,
   } = userData;
   try {
     // 유저 생성
@@ -21,6 +22,7 @@ const createUser = async (userData) => {
         name,
         role,
         is_active,
+        hospital_name_id,
       },
     });
   } catch (error) {
@@ -40,6 +42,7 @@ const getAllUsers = async () => {
       is_active: true,
       created_at: true,
       updated_at: true,
+      hospital_name_id: true,
     },
   });
 };
@@ -51,6 +54,7 @@ const updateUser = async (user_id, data) => {
       name: data.name,
       role: data.role,
       is_active: Boolean(data.is_active),
+      hospital_name_id: data.hospital_name_id,
     },
   });
 };

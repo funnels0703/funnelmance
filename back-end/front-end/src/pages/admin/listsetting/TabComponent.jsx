@@ -336,13 +336,15 @@ function TabComponent() {
                   }`}
                 >
                   {editableId === item.id ? (
-                    <CustomDropdown
-                      selectedValue={item.status}
-                      options={statusOptions}
-                      onChange={(newStatus) =>
-                        handleStatusChange(item.id, newStatus)
-                      }
-                    />
+                    <div style={{ width: "140px", height: "36px" }}>
+                      <CustomDropdown
+                        selectedValue={item.status}
+                        options={statusOptions}
+                        onChange={(newStatus) =>
+                          handleStatusChange(item.id, newStatus)
+                        }
+                      />
+                    </div>
                   ) : (
                     <span className="normalSpan">{item.status}</span>
                   )}

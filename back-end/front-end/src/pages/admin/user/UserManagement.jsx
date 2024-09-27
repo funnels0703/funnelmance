@@ -11,12 +11,32 @@ const UserManagement = () => {
     username: "",
     password: "",
     name: "",
-    role: "사원",
+    role: 2,
     isActive: true,
+    hospital_name_id: "",
   });
   const [editingUserId, setEditingUserId] = useState(null);
   const [selectedRows, setSelectedRows] = useState([]); // 선택된 행 상태
+  // 병원 리스트
+  const [hospitals, setHospitals] = useState([]); // 병원 데이터를 저장할 state
+  useEffect(() => {
+    // 병원 데이터를 가져오는 함수
+    const fetchHospitals = async () => {
+      try {
+        const response = await axios.get("/api/list/hospitals");
 
+        const options = response.data.items.map((hospital) => ({
+          value: hospital.id,
+          label: hospital.name,
+        }));
+        setHospitals(options); // 변환된 데이터를 state에 저장
+      } catch (error) {
+        console.error("병원 데이터를 가져오는 중 오류가 발생했습니다:", error);
+      }
+    };
+
+    fetchHospitals(); // 컴포넌트가 처음 렌더링될 때 데이터 요청
+  }, []); // 빈 배열([])을 넣어 컴포넌트가 처음 렌더링될 때 한 번만 실행
   // 유저 데이터 가져오기
   useEffect(() => {
     const fetchUsers = async () => {
@@ -97,10 +117,10 @@ const UserManagement = () => {
 
   // 권한 옵션 데이터
   const roleOptions = [
-    { label: "광고 관리자", value: "2" },
-    { label: "콜 관리자", value: "3" },
-    { label: "콜 직원", value: "4" },
-    { label: "클라이언트", value: "5" },
+    { label: "광고 관리자", value: 2 },
+    { label: "콜 관리자", value: 3 },
+    { label: "콜 직원", value: 4 },
+    { label: "클라이언트", value: 5 },
   ];
 
   return (
@@ -141,13 +161,30 @@ const UserManagement = () => {
         </div>
         <div className="form-group">
           <label>권한</label>
-          <CustomDropdown
-            options={roleOptions}
-            selectedValue={newUser.role}
-            onChange={(value) => handleNewUserChange("role", value)}
-          />
+          <div style={{ width: "380px", height: "50px" }}>
+            <CustomDropdown
+              options={roleOptions}
+              selectedValue={newUser.role}
+              onChange={(value) => handleNewUserChange("role", value)}
+              bigDrop={1}
+            />
+          </div>
         </div>
-        <button onClick={handleRegister}>계정 등록하기</button>
+        <div className="form-group">
+          <label>관리병원</label>
+          <div style={{ width: "380px", height: "50px" }}>
+            <CustomDropdown
+              options={hospitals} // 병원 목록 get 해서 뿌려주기 value는 병원 id 값 label 은 병원 이름
+              selectedValue={newUser.role}
+              onChange={(value) => handleNewUserChange("role", value)}
+              bigDrop={1}
+              search={1}
+            />
+          </div>
+        </div>
+        <div className="btnBox">
+          <button onClick={handleRegister}>계정 등록하기</button>
+        </div>
       </div>
 
       {/* 유저 테이블 */}
@@ -157,10 +194,11 @@ const UserManagement = () => {
         <thead>
           <tr>
             <th style={{ width: "8%" }}>선택</th>
-            <th style={{ width: "calc((100% - 8% * 2) / 4)" }}>아이디</th>
-            <th style={{ width: "calc((100% - 8% * 2) / 4)" }}>비밀번호</th>
-            <th style={{ width: "calc((100% - 8% * 2) / 4)" }}>이름</th>
-            <th style={{ width: "calc((100% - 8% * 2) / 4)" }}>권한</th>
+            <th style={{ width: "calc((100% - 8% * 2) / 5)" }}>아이디</th>
+            <th style={{ width: "calc((100% - 8% * 2) / 5)" }}>비밀번호</th>
+            <th style={{ width: "calc((100% - 8% * 2) / 5)" }}>이름</th>
+            <th style={{ width: "calc((100% - 8% * 2) / 5)" }}>권한</th>
+            <th style={{ width: "calc((100% - 8% * 2) / 5)" }}>관리 병원</th>
             <th style={{ width: "8%" }}>수정</th>
           </tr>
         </thead>
@@ -179,73 +217,75 @@ const UserManagement = () => {
               </td>
               <td>{user.username}</td>
               <td>
-                {editingUserId === user.user_id ? (
-                  <input
-                    type="password"
-                    value={user.password}
-                    onChange={(e) =>
-                      handleUserChange(user.user_id, "password", e.target.value)
-                    }
-                    className={editingUserId === user.user_id ? "editing" : ""}
-                  />
-                ) : (
-                  user.password
-                )}
+                <input
+                  type="password"
+                  value={user.password}
+                  disabled={editingUserId !== user.user_id} // 수정 모드일 때만 활성화
+                  onChange={(e) =>
+                    handleUserChange(user.user_id, "password", e.target.value)
+                  }
+                />
               </td>
               <td>
-                {editingUserId === user.user_id ? (
-                  <input
-                    type="text"
-                    value={user.name}
-                    onChange={(e) =>
-                      handleUserChange(user.user_id, "name", e.target.value)
-                    }
-                  />
-                ) : (
-                  user.name
-                )}
+                <input
+                  type="text"
+                  value={user.name}
+                  disabled={editingUserId !== user.user_id} // 수정 모드일 때만 활성화
+                  onChange={(e) =>
+                    handleUserChange(user.user_id, "name", e.target.value)
+                  }
+                />
               </td>
 
               <td>
                 {editingUserId === user.user_id ? (
-                  <CustomDropdown
-                    options={[
-                      { label: "PM", value: "PM" },
-                      { label: "콜팀", value: "콜팀" },
-                      { label: "사원", value: "사원" },
-                      { label: "팀장", value: "팀장" },
-                    ]}
-                    selectedValue={user.role}
-                    onChange={(value) =>
-                      handleUserChange(user.user_id, "role", value)
-                    }
-                  />
-                ) : (
-                  user.role
-                )}
-              </td>
-
-              {/* <td>
-                {editingUserId === user.user_id ? (
-                  <select
-                    value={user.is_active ? "true" : "false"}
-                    onChange={(e) =>
-                      handleUserChange(
-                        user.user_id,
-                        "is_active",
-                        e.target.value === "true"
-                      )
-                    }
+                  <div
+                    style={{
+                      width: "90%`",
+                      height: "36px",
+                      paddingRight: "15%",
+                    }}
                   >
-                    <option value="true">활성화</option>
-                    <option value="false">비활성화</option>
-                  </select>
-                ) : user.is_active ? (
-                  "활성화"
+                    <CustomDropdown
+                      options={roleOptions}
+                      selectedValue={user.role}
+                      onChange={(value) =>
+                        handleUserChange(user.user_id, "role", value)
+                      }
+                    />
+                  </div>
                 ) : (
-                  "비활성화"
+                  roleOptions.find((option) => option.value === user.role)
+                    ?.label || "총 관리자"
                 )}
-              </td> */}
+              </td>
+              <td>
+                {editingUserId === user.user_id ? (
+                  <div
+                    style={{
+                      width: "100%",
+                      height: "36px",
+                      paddingRight: "15%",
+                    }}
+                  >
+                    <CustomDropdown
+                      options={hospitals} // 여기도 병원
+                      selectedValue={user.role}
+                      onChange={(value) =>
+                        handleUserChange(
+                          user.user_id,
+                          "hospital_name_id",
+                          value
+                        )
+                      }
+                    />
+                  </div>
+                ) : (
+                  hospitals.find(
+                    (hospital) => hospital.value === user.hospital_name_id
+                  )?.label || "병원 미지정"
+                )}
+              </td>
               <td>
                 {editingUserId === user.user_id ? (
                   <button onClick={() => handleSave(user)}>저장</button>

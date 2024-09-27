@@ -1,15 +1,15 @@
-// CustomDropdown.jsx
+// CustomDropdown.jsx 왜 공유 되징..
 .dropdown {
   position: relative;
-  width: 140px;
+  width: 100%;
+  height: 100%;
   font-family: Arial, sans-serif;
-
   .dropdown-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 36px;
-    line-height: 36px;
+    height: 100%;
+    line-height: 100%;
     padding: 0 10px 0 21px;
     border: 1px solid #4880ff;
     border-radius: 4px;
@@ -34,11 +34,14 @@
     border: 1px solid #4880ff;
     border-radius: 4px;
     background-color: white;
-    max-height: 150px;
     overflow-y: auto;
     z-index: 100;
   }
-
+  .dropdown-search {
+    width: 80%;
+    padding: 5px 17px !important;
+    border: none !important;
+  }
   .dropdown-option {
     height: 25px;
     line-height: 25px;
@@ -49,7 +52,22 @@
     color: #979797;
     font-size: 12px;
   }
-
+  .dropdown-option-set {
+    height: 56px;
+    line-height: 56px;
+    text-align: start;
+    padding: 0 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #f1f1f1;
+    color: #979797;
+    font-size: 16px;
+    margin: 4px 7px;
+    border-radius: 5px;
+  }
+  .dropdown-option-set:hover {
+    background-color: #4880ff;
+    color: white !important;
+  }
   .dropdown-option.selected {
     background-color: #4880ff;
     color: white;
@@ -65,9 +83,13 @@
     margin-bottom: 50px;
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     gap: 20px 4%;
+    .btnBox {
+      width: 100%;
+      text-align: center;
+    }
     button {
       width: 240px;
       height: 50px;
@@ -162,6 +184,19 @@
     padding: 6px;
     font-size: 14px;
   }
+  .user-table td input[type="text"],
+  .user-table td input[type="password"] {
+    width: 140px;
+    height: 36px;
+    color: rgba(32, 34, 36, 0.3);
+    text-align: center;
+    font-size: 14px;
+    font-weight: 300;
+    background: rgba(208, 234, 255, 0.2);
+    border: 1px solid #979797;
+    outline: none;
+  }
+
   .user-table td button {
     width: 54px;
     height: 27px;
