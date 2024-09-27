@@ -10,7 +10,7 @@ datasource db {
 model advertising_company {
   id                                                                            Int                @id @default(autoincrement())
   name                                                                          String             @db.VarChar(255)
-  status                                                                        String?            @default("활성화") @db.VarChar(50)
+  status                                                                        Int?               @default(1)
   url_code_setting_id                                                           Int?
   url_code_setting                                                              url_code_setting?  @relation(fields: [url_code_setting_id], references: [id], map: "advertising_company_ibfk_1")
   url_code_setting_url_code_setting_advertising_company_idToadvertising_company url_code_setting[] @relation("url_code_setting_advertising_company_idToadvertising_company")
@@ -52,7 +52,7 @@ model customor_db {
 model event_name {
   id                                                          Int                @id @default(autoincrement())
   name                                                        String             @db.VarChar(255)
-  status                                                      String?            @default("활성화") @db.VarChar(50)
+  status                                                      Int                @default(1)
   url_code_setting_id                                         Int?
   url_code_setting                                            url_code_setting?  @relation(fields: [url_code_setting_id], references: [id], map: "event_name_ibfk_1")
   url_code_setting_url_code_setting_event_name_idToevent_name url_code_setting[] @relation("url_code_setting_event_name_idToevent_name")
@@ -82,6 +82,7 @@ model hospital_name {
   hospital_code                                                     String             @db.VarChar(60)
   url_code_setting                                                  url_code_setting?  @relation(fields: [url_code_setting_id], references: [id], map: "hospital_name_ibfk_1")
   url_code_setting_url_code_setting_hospital_name_idTohospital_name url_code_setting[] @relation("url_code_setting_hospital_name_idTohospital_name")
+  user                                                              user[]
 
   @@index([url_code_setting_id], map: "url_code_setting_id")
 }
@@ -115,16 +116,20 @@ model url_code_setting {
 }
 
 model user {
-  user_id      Int            @id @default(autoincrement())
-  username     String         @unique(map: "username") @db.VarChar(255)
-  password     String         @db.VarChar(255)
-  name         String         @db.VarChar(255)
-  role         String?        @db.VarChar(20)
-  is_active    Boolean?       @default(true)
-  created_at   DateTime?      @default(now()) @db.Timestamp(0)
-  updated_at   DateTime?      @default(now()) @db.Timestamp(0)
-  ad_spending  ad_spending[]
-  notice_board notice_board[]
+  user_id          Int            @id @default(autoincrement())
+  username         String         @unique(map: "username") @db.VarChar(255)
+  password         String         @db.VarChar(255)
+  name             String         @db.VarChar(255)
+  role             String?        @db.VarChar(20)
+  is_active        Boolean?       @default(true)
+  created_at       DateTime?      @default(now()) @db.Timestamp(0)
+  updated_at       DateTime?      @default(now()) @db.Timestamp(0)
+  hospital_name_id Int?
+  ad_spending      ad_spending[]
+  notice_board     notice_board[]
+  hospital_name    hospital_name? @relation(fields: [hospital_name_id], references: [id], onUpdate: NoAction, map: "fk_hospital_name")
+
+  @@index([hospital_name_id], map: "fk_hospital_name")
 }
 
 model user_settings {
