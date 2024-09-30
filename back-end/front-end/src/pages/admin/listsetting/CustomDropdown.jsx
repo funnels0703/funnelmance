@@ -6,11 +6,16 @@ function CustomDropdown({ selectedValue, options, onChange, bigDrop, search }) {
     const [searchTerm, setSearchTerm] = useState(''); // 검색어를 위한 상태
 
     console.log(selectedValue, options);
-    // selectedValue와 options를 기반으로 selectedOption 초기화
+
+    // selectedValue가 없으면 기본적으로 "All"을 선택
     useEffect(() => {
-        const currentOption = options.find((option) => option.value === selectedValue);
-        if (currentOption) {
-            setSelectedOption(currentOption.label);
+        if (selectedValue === null || selectedValue === undefined) {
+            setSelectedOption('All');
+        } else {
+            const currentOption = options.find((option) => option.value === selectedValue);
+            if (currentOption) {
+                setSelectedOption(currentOption.label);
+            }
         }
     }, [selectedValue, options]);
 
