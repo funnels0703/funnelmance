@@ -2,6 +2,39 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
+// URL 코드 데이터를 페이지네이션과 함께 가져오는 컨트롤러 함수
+const getCodes = async (pageInt, limitInt) => {
+  console.log(222);
+  const totalItems = await prisma.url_code_setting.count(); // 전체 레코드 수 계산
+  const totalPages = Math.ceil(totalItems / limitInt); // 전체 페이지 수 계산
+
+  // 페이지에 맞는 URL 코드 설정 데이터를 가져옴
+  const codes = await prisma.url_code_setting.findMany({
+    skip: (pageInt - 1) * limitInt, // 페이지 건너뛰기
+    take: limitInt, // 페이지당 가져올 항목 수
+    select: {
+      id: true,
+      user_id: true,
+      url_code: true,
+      db_request_count: true,
+      db_click_count: true,
+      created_at: true,
+      updated_at: true,
+      ad_title: true,
+      ad_number: true,
+      event_name_id: true,
+      hospital_name_id: true,
+      advertising_company_id: true,
+      ad_spending: true,
+      advertising_company: true, // 관계 데이터도 필요하면 추가
+      event_name: true, // 관계 데이터도 필요하면 추가
+      hospital_name: true, // 관계 데이터도 필요하면 추가
+    },
+  });
+
+  return { codes, totalPages };
+};
+
 async function checkCodeUniqueness(url_code) {
   const existingCode = await prisma.url_code_setting.findUnique({
     where: {
@@ -79,6 +112,7 @@ async function createClickRecord(urlCode, ip) {
 }
 
 module.exports = {
+  getCodes,
   checkCodeUniqueness,
   createUrlCode,
   // 접속 처리

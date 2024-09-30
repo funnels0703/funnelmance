@@ -104,25 +104,23 @@ var getAllUsersController = function getAllUsersController(req, res) {
             currentPage: pageInt // 현재 페이지
 
           });
-          console.log(11);
-          _context2.next = 19;
+          _context2.next = 17;
           break;
 
-        case 15:
-          _context2.prev = 15;
+        case 14:
+          _context2.prev = 14;
           _context2.t0 = _context2["catch"](3);
           res.status(500).json({
             error: "유저 조회 중 오류가 발생했습니다.",
             details: _context2.t0.message
           });
-          console.log(_context2.t0);
 
-        case 19:
+        case 17:
         case "end":
           return _context2.stop();
       }
     }
-  }, null, null, [[3, 15]]);
+  }, null, null, [[3, 14]]);
 };
 
 var updateUserController = function updateUserController(req, res) {

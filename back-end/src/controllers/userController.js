@@ -59,13 +59,11 @@ const getAllUsersController = async (req, res) => {
       totalPages, // 전체 페이지 수
       currentPage: pageInt, // 현재 페이지
     });
-    console.log(11);
   } catch (error) {
     res.status(500).json({
       error: "유저 조회 중 오류가 발생했습니다.",
       details: error.message,
     });
-    console.log(error);
   }
 };
 

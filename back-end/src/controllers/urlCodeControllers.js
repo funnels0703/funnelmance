@@ -1,5 +1,6 @@
 // controllers/urlCodeController.js
 const {
+  getCodes,
   findCodeByUrlCode,
   findClickByIpAndCode,
   incrementClickCount,
@@ -7,6 +8,29 @@ const {
   checkCodeUniqueness,
   createUrlCode,
 } = require("../models/urlCodeModel");
+
+const getCodesController = async (req, res) => {
+  const { page = 1, limit = 10 } = req.query;
+  const pageInt = parseInt(page, 10);
+  const limitInt = parseInt(limit, 10);
+
+  try {
+    console.log(111);
+    // 모델에서 URL 코드 설정 데이터를 가져옴
+    const { codes, totalPages } = await getCodes(pageInt, limitInt);
+
+    res.status(200).json({
+      codes, // 가져온 코드 데이터 반환
+      totalPages, // 전체 페이지 수
+      currentPage: pageInt, // 현재 페이지
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: "코드 조회 중 오류가 발생했습니다.",
+      details: error.message,
+    });
+  }
+};
 
 const createUrlCodeController = async (req, res) => {
   const {
@@ -95,6 +119,7 @@ async function postUrlCodeData(req, res) {
 }
 
 module.exports = {
+  getCodesController,
   createUrlCodeController,
   // 접속처리
   getUrlCodeData,
