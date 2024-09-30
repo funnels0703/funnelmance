@@ -172,8 +172,8 @@ const UserManagement = () => {
                     <div style={{ width: '380px', height: '50px' }}>
                         <CustomDropdown
                             options={hospitals} // 병원 목록 get 해서 뿌려주기 value는 병원 id 값 label 은 병원 이름
-                            selectedValue={newUser.role}
-                            onChange={(value) => handleNewUserChange('role', value)}
+                            selectedValue={hospitals.id}
+                            onChange={(value) => handleNewUserChange('hospital_name_id', value)}
                             bigDrop={1}
                             search={1}
                         />
@@ -257,7 +257,7 @@ const UserManagement = () => {
                                     >
                                         <CustomDropdown
                                             options={hospitals} // 여기도 병원
-                                            selectedValue={user.role}
+                                            selectedValue={user.hospital_name_id} // 현재 유저의 병원 ID를 selectedValue로 전달
                                             onChange={(value) =>
                                                 handleUserChange(user.user_id, 'hospital_name_id', value)
                                             }
