@@ -35,7 +35,7 @@ function AdLandingPage({ urlCode }) {
   }
 
   return (
-    <div className="ad-landing-page">
+    <div className="ad-landing-page container">
       <h2>광고 랜딩 페이지</h2>
       <p>아래 정보를 입력해 주세요.</p>
       <div className="input-group">

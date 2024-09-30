@@ -1,4 +1,6 @@
 // src/controllers/userController.js
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
 
 const {
   getAllUsers,
@@ -25,14 +27,45 @@ const createUserController = async (req, res) => {
 };
 
 const getAllUsersController = async (req, res) => {
+  const { page = 1, limit = 10 } = req.query; // 클라이언트에서 페이지와 항목 수를 받음
+  const pageInt = parseInt(page, 10);
+  const limitInt = parseInt(limit, 10);
   try {
-    const users = await getAllUsers();
-    res.status(200).json(users);
+    const totalItems = await prisma.user.count(); // 전체 유저 수 계산
+    const totalPages = Math.ceil(totalItems / limitInt); // 전체 페이지 수 계산
+
+    // 유저 데이터 가져오기 (페이지네이션 적용)
+    const users = await prisma.user.findMany({
+      skip: (pageInt - 1) * limitInt, // 페이지 건너뛰기
+      take: limitInt, // 페이지당 가져올 항목 수
+      select: {
+        user_id: true,
+        password: true,
+        username: true,
+        name: true,
+        role: true,
+        is_active: true,
+        created_at: true,
+        updated_at: true,
+        hospital_name_id: true,
+      },
+      orderBy: {
+        user_id: "desc", // user_id를 기준으로 내림차순 정렬
+      },
+    });
+
+    res.status(200).json({
+      users, // 유저 데이터 반환
+      totalPages, // 전체 페이지 수
+      currentPage: pageInt, // 현재 페이지
+    });
+    console.log(11);
   } catch (error) {
     res.status(500).json({
       error: "유저 조회 중 오류가 발생했습니다.",
       details: error.message,
     });
+    console.log(error);
   }
 };
 
