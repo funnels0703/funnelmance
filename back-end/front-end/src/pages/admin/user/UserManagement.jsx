@@ -4,6 +4,7 @@ import TitleBox from '../../../components/TitleBox';
 
 import './user.scss';
 import CustomDropdown from '../listsetting/CustomDropdown';
+import DeleteBox from '../listsetting/DeleteBox';
 
 const UserManagement = () => {
     const [users, setUsers] = useState([]);
@@ -21,6 +22,8 @@ const UserManagement = () => {
     //페이지네이션
     const [currentPage, setCurrentPage] = useState(1); // 현재 페이지
     const [totalPages, setTotalPages] = useState(1); // 전체 페이지 수
+
+    const [showDeleteBox, setShowDeleteBox] = useState(false); // 모달 표시 여부
 
     // 병원 리스트
     const [hospitals, setHospitals] = useState([]); // 병원 데이터를 저장할 state
@@ -124,6 +127,35 @@ const UserManagement = () => {
         );
     };
 
+    // 삭제 버튼 클릭 시 모달을 띄움
+    const handleDeleteClick = () => {
+        if (selectedRows.length === 0) {
+            alert('삭제할 유저를 선택하세요.');
+            return;
+        }
+        setShowDeleteBox(true); // 모달을 띄움
+    };
+
+    // 모달에서 확인을 눌렀을 때 삭제 실행
+    const handleConfirmDelete = async () => {
+        try {
+            await axios.post('/api/user/delete', { userIds: selectedRows }); // 선택된 유저 ID 배열 전송
+            setSelectedRows([]); // 선택된 행 초기화
+            fetchUsers(); // 삭제 후 유저 목록을 다시 불러옴
+        } catch (error) {
+            console.error('유저 삭제 중 오류 발생:', error);
+            alert('유저 삭제에 실패했습니다.');
+        }
+        setShowDeleteBox(false); // 모달 닫기
+    };
+
+    // 모달에서 취소를 눌렀을 때 모달을 닫기만 함
+    const handleCancelDelete = () => {
+        setShowDeleteBox(false); // 모달 닫기
+    };
+
+    const deleteMessage = '현재 선택한 계정을 정말 삭제하시겠습니까?';
+
     // 권한 옵션 데이터
     const roleOptions = [
         { label: '광고 관리자', value: 2 },
@@ -204,7 +236,7 @@ const UserManagement = () => {
 
             {/* 유저 테이블 */}
             <h2>계정 리스트</h2>
-            <button>삭제</button>
+            <button onClick={handleDeleteClick}>삭제</button>
             <table className="user-table">
                 <thead>
                     <tr>
@@ -348,6 +380,9 @@ const UserManagement = () => {
                     />
                 </button>
             </div>
+            {showDeleteBox && (
+                <DeleteBox message={deleteMessage} onCancel={handleCancelDelete} onConfirm={handleConfirmDelete} />
+            )}
         </div>
     );
 };
