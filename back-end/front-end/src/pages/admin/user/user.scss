@@ -16,6 +16,7 @@
         background-color: white;
         cursor: pointer;
     }
+
     .dropdown-arrow {
         border: solid black;
         border-width: 0 1px 1px 0;
@@ -34,7 +35,7 @@
         border: 1px solid #4880ff;
         border-radius: 4px;
         background-color: white;
-        overflow-y: auto;
+        overflow-y: scroll;
         overflow-x: hidden;
         z-index: 100;
     }
@@ -91,6 +92,7 @@
         border-bottom: none;
     }
 }
+
 // UserManagement.jsx
 .user_container {
     .user-form {
@@ -138,6 +140,7 @@
         border-radius: 10px;
         border: 1px solid #d9d9d9;
         padding: 15px 20px;
+
         &:focus {
             border: 1px solid #4880ff;
             outline: none;
@@ -186,48 +189,49 @@
             border-bottom: 1px solid rgba(151, 151, 151, 0.6);
             height: 65px;
             font-size: 14px;
+            input[type='checkbox'] {
+                width: 17px;
+                height: 17px;
+            }
+            input,
+            select {
+                padding: 6px;
+                font-size: 14px;
+                border-radius: 2px;
+            }
+            input[type='text'],
+            input[type='password'] {
+                width: 140px;
+                height: 36px;
+                color: rgba(32, 34, 36, 0.3);
+                text-align: center;
+                font-size: 14px;
+                font-weight: 300;
+                background: rgba(208, 234, 255, 0.2);
+                border: 1px solid #979797;
+                outline: none;
+            }
+            button {
+                width: 54px;
+                height: 27px;
+                border-radius: 5px;
+                color: #4880ff;
+                font-size: 12px;
+                font-weight: 700;
+                background: rgba(72, 128, 255, 0.2);
+                border: none;
+                &:hover {
+                    background-color: #005bb5;
+                }
+            }
         }
-        td input[type='checkbox'] {
-            width: 17px;
-            height: 17px;
-        }
+
         th:nth-of-type(1),
         td:nth-of-type(1) {
             text-align: center;
         }
     }
 
-    .user-table td input,
-    .user-table td select {
-        padding: 6px;
-        font-size: 14px;
-    }
-    .user-table td input[type='text'],
-    .user-table td input[type='password'] {
-        width: 140px;
-        height: 36px;
-        color: rgba(32, 34, 36, 0.3);
-        text-align: center;
-        font-size: 14px;
-        font-weight: 300;
-        background: rgba(208, 234, 255, 0.2);
-        border: 1px solid #979797;
-        outline: none;
-    }
-
-    .user-table td button {
-        width: 54px;
-        height: 27px;
-        border-radius: 5px;
-        color: #4880ff;
-        font-size: 12px;
-        font-weight: 700;
-        background: rgba(72, 128, 255, 0.2);
-        border: none;
-    }
-    .user-table td button:hover {
-        background-color: #005bb5;
-    }
     .no-options {
         width: 90%;
         border-radius: 5px;
@@ -236,5 +240,40 @@
         line-height: 56px;
         margin: 4px 7px;
         text-align: start;
+    }
+}
+//페이지네이션
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    button {
+        background-color: white;
+        border: none;
+        color: #979797;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: normal;
+        margin: 0 12.5px;
+    }
+    button.currentPage {
+        color: #202224;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: normal;
+        text-decoration-line: underline;
+    }
+    button:hover {
+        background-color: #f0f0f0;
+    }
+    .doubleArrow {
+        width: 11px;
+        height: 12px;
+    }
+    .singleArrow {
+        width: 6px;
+        height: 12px;
     }
 }

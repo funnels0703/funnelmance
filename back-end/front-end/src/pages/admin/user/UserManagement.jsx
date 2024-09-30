@@ -17,6 +17,12 @@ const UserManagement = () => {
     });
     const [editingUserId, setEditingUserId] = useState(null);
     const [selectedRows, setSelectedRows] = useState([]); // 선택된 행 상태
+    const itemsPerPage = 10; // 한 페이지에 표시할 항목 수
+
+    //페이지네이션
+    const [currentPage, setCurrentPage] = useState(1); // 현재 페이지
+    const [totalPages, setTotalPages] = useState(1); // 전체 페이지 수
+
     // 병원 리스트
     const [hospitals, setHospitals] = useState([]); // 병원 데이터를 저장할 state
     useEffect(() => {
@@ -42,17 +48,28 @@ const UserManagement = () => {
     }, []);
     // 유저 데이터 가져오기
     useEffect(() => {
+        // 유저 데이터 가져오기
         const fetchUsers = async () => {
             try {
-                const response = await axios.get('/api/user/list');
-                setUsers(response.data);
+                const response = await axios.get(`/api/user/list?page=${currentPage}&limit=${itemsPerPage}`);
+                setUsers(response.data.users);
+                setTotalPages(response.data.totalPages); // 서버에서 받은 전체 페이지 수
+                setCurrentPage(response.data.currentPage); // 서버에서 받은 현재 페이지
             } catch (error) {
-                console.error('유저 데이터를 가져오는 중 오류가 발생했습니다:', error);
+                console.error('데이터 로딩 오류:', error);
+                alert('데이터를 불러오는데 실패했습니다.');
+                setUsers([]);
             }
         };
-
         fetchUsers();
-    }, []);
+    }, [currentPage]);
+
+    // ----------------------------------- 페이지 네이션
+    const handlePageChange = (page) => {
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page); // 페이지 변경
+        }
+    };
 
     // 입력 필드 변경 핸들러 (새 유저)
     const handleNewUserChange = (name, value) => {
@@ -279,6 +296,52 @@ const UserManagement = () => {
                     ))}
                 </tbody>
             </table>
+
+            {/* 페이지네이션 */}
+            <div className="pagination">
+                <button onClick={() => handlePageChange(1)}>
+                    <img
+                        src={process.env.PUBLIC_URL + '/images/page/start.png'}
+                        className="doubleArrow"
+                        alt="첫 페이지"
+                    />
+                </button>
+                {/* 이전 페이지 */}
+                <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
+                    <img
+                        src={process.env.PUBLIC_URL + '/images/page/before.png'}
+                        className="singleArrow"
+                        alt="이전 페이지"
+                    />
+                </button>
+                {Array.from({ length: totalPages }, (_, index) => index + 1)
+                    .slice((Math.ceil(currentPage / 10) - 1) * 10, Math.ceil(currentPage / 10) * 10)
+                    .map((page) => (
+                        <button
+                            key={page}
+                            onClick={() => handlePageChange(page)}
+                            className={page === currentPage ? 'currentPage' : ''}
+                        >
+                            {page}
+                        </button>
+                    ))}
+                <button onClick={() => handlePageChange(currentPage + 10)}>{'...'}</button> {/* 다음 페이지 묶음 */}
+                <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
+                    <img
+                        src={process.env.PUBLIC_URL + '/images/page/end.png'}
+                        className="singleArrow"
+                        alt="다음 페이지"
+                    />
+                </button>
+                {/* 마지막 페이지 */}
+                <button onClick={() => handlePageChange(totalPages)}>
+                    <img
+                        src={process.env.PUBLIC_URL + '/images/page/next.png'}
+                        className="doubleArrow"
+                        alt="마지막 페이지"
+                    />
+                </button>
+            </div>
         </div>
     );
 };

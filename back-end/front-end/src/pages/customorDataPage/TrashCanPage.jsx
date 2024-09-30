@@ -39,7 +39,7 @@ function TrashcanPage() {
   }
 
   return (
-    <div className="TrashContainer">
+    <div className="TrashContainer container">
       <h2>삭제된 고객 데이터</h2>
       <p style={{ color: "red", fontWeight: "bold" }}>데이터 수정 중</p>
       <table className="customor-table">
