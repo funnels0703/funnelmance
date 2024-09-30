@@ -85,7 +85,8 @@ function FilterComponent({
         updateDateRange(value);
     };
 
-    const handleCompanyOptionClick = (company) => {
+    const handleCompanyOptionClick = (e, company) => {
+        e.stopPropagation(); // 클릭 이벤트가 상위로 전파되지 않도록 막습니다.
         setSelectedCompany(company);
         setIsCompanyDropdownOpen(false);
         onFilterChange({
@@ -295,7 +296,13 @@ function FilterComponent({
 
             {/* 회사 필터 */}
             <div className="company-filter">
-                <div className="company-custom-select" onClick={handleCompanyDropdownClick}>
+                <div
+                    className="company-custom-select"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        handleCompanyDropdownClick(e);
+                    }}
+                >
                     <input
                         type="text"
                         placeholder="조회할 매체를 선택하세요"
@@ -319,7 +326,7 @@ function FilterComponent({
                                     checked={checkedCompanies.includes(company.id)} // 광고 회사 설정에 있으면 체크
                                     onChange={() => handleCheckboxChange(company.id)}
                                 />
-                                <span onClick={() => handleCompanyOptionClick(company)}>{company.name}</span>
+                                <span onClick={(e) => handleCompanyOptionClick(e, company)}>{company.name}</span>
                             </li>
                         ))}
                     </ul>
