@@ -5,6 +5,7 @@ function CustomDropdown({ selectedValue, options, onChange, bigDrop, search }) {
     const [selectedOption, setSelectedOption] = useState('');
     const [searchTerm, setSearchTerm] = useState(''); // 검색어를 위한 상태
 
+    console.log(selectedValue, options);
     // selectedValue와 options를 기반으로 selectedOption 초기화
     useEffect(() => {
         const currentOption = options.find((option) => option.value === selectedValue);

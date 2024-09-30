@@ -36,7 +36,6 @@ function TabComponent() {
             // status 값에 따라 "진행 중", "종료"로 변환
             const transformedData = response.data.items.map((item) => ({
                 ...item,
-                status: item.status === 1 ? '진행 중' : item.status === 2 ? '종료' : '알 수 없음', // 추가적인 상태에 대한 기본 처리
                 edit: false,
             }));
 
@@ -47,6 +46,17 @@ function TabComponent() {
             console.error('데이터 로딩 오류:', error);
             alert('데이터를 불러오는데 실패했습니다.');
             setData([]);
+        }
+    };
+    // 상태 변환 헬퍼 함수
+    const getStatusLabel = (status) => {
+        switch (status) {
+            case 1:
+                return '진행 중';
+            case 2:
+                return '종료';
+            default:
+                return '알 수 없음';
         }
     };
 
@@ -102,7 +112,7 @@ function TabComponent() {
             setEditableId(null);
         } catch (error) {
             console.error('데이터 업데이트 오류:', error);
-            alert('데이터 업데이트에 실패했습니다.');
+            alert('진행/종료를 선택해주세요');
         }
     };
 
@@ -299,8 +309,8 @@ function TabComponent() {
                                     </td>
                                 )}
 
-                                <td className={`${item.status === '종료' ? 'editInputColor' : ''}`}>{item.name}</td>
-                                <td className={`${item.status === '종료' ? 'editInputColor' : ''}`}>
+                                <td className={`${item.status === 2 ? 'editInputColor' : ''}`}>{item.name}</td>
+                                <td className={`${item.status === 2 ? 'editInputColor' : ''}`}>
                                     {editableId === item.id ? (
                                         <div style={{ width: '140px', height: '36px' }}>
                                             <CustomDropdown
@@ -310,12 +320,12 @@ function TabComponent() {
                                             />
                                         </div>
                                     ) : (
-                                        <span className="normalSpan">{item.status}</span>
+                                        <span className="normalSpan">{getStatusLabel(item.status)}</span>
                                     )}
                                 </td>
 
                                 {activeTab === 'hospitals' && (
-                                    <td className={`${item.status === '종료' ? 'editInputColor' : ''}`}>
+                                    <td className={`${item.status === 2 ? 'editInputColor' : ''}`}>
                                         <input
                                             type="text"
                                             value={item.manager || ''}
@@ -330,7 +340,7 @@ function TabComponent() {
                                         />
                                     </td>
                                 )}
-                                <td className={`${item.status === '종료' ? 'editInputColor' : ''}`}>
+                                <td className={`${item.status === 2 ? 'editInputColor' : ''}`}>
                                     {editableId === item.id ? (
                                         <button className="listSaveBTN" onClick={() => handleUpdate(item.id)}>
                                             저장
@@ -338,7 +348,7 @@ function TabComponent() {
                                     ) : (
                                         <button
                                             className={`${
-                                                item.status === '종료' ? 'listSaveBTN editInputColor' : 'listSaveBTN'
+                                                item.status === 2 ? 'listSaveBTN editInputColor' : 'listSaveBTN'
                                             }`}
                                             onClick={() => handleEdit(item.id)}
                                         >
