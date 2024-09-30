@@ -258,7 +258,7 @@ function CustomorDataPage({ title, get_status, put_status }) {
                         </tr>
                     ) : (
                         customors.map((customor, index) => (
-                            <tr key={customor.id}>
+                            <tr key={customor.id} className={customor.isSelected ? 'selected' : ''}>
                                 <td style={{ width: '3%' }}>
                                     <input
                                         type="checkbox"
@@ -273,7 +273,7 @@ function CustomorDataPage({ title, get_status, put_status }) {
                                         type="text"
                                         value={customor.dividend_status}
                                         onChange={(e) => handleInputChange(index, 'dividend_status', e.target.value)}
-                                        disabled={!editState[customor.id]}
+                                        disabled={true}
                                     />
                                 </td>
                                 <td style={{ width: '9%' }}>
@@ -281,7 +281,7 @@ function CustomorDataPage({ title, get_status, put_status }) {
                                         type="text"
                                         value={customor.hospital_name}
                                         onChange={(e) => handleInputChange(index, 'hospital_name', e.target.value)}
-                                        disabled={!editState[customor.id]}
+                                        disabled={true}
                                     />
                                 </td>
                                 <td style={{ width: '5%' }}>
@@ -291,7 +291,7 @@ function CustomorDataPage({ title, get_status, put_status }) {
                                         onChange={(e) =>
                                             handleInputChange(index, 'advertising_company', e.target.value)
                                         }
-                                        disabled={!editState[customor.id]}
+                                        disabled={true}
                                     />
                                 </td>
                                 <td style={{ width: '11%' }}>
@@ -299,7 +299,7 @@ function CustomorDataPage({ title, get_status, put_status }) {
                                         type="text"
                                         value={customor.ad_title}
                                         onChange={(e) => handleInputChange(index, 'ad_title', e.target.value)}
-                                        disabled={!editState[customor.id]}
+                                        disabled={true}
                                     />
                                 </td>
                                 <td style={{ width: '8%' }}>
@@ -307,7 +307,7 @@ function CustomorDataPage({ title, get_status, put_status }) {
                                         type="text"
                                         value={customor.event_name}
                                         onChange={(e) => handleInputChange(index, 'event_name', e.target.value)}
-                                        disabled={!editState[customor.id]}
+                                        disabled={true}
                                     />
                                 </td>
                                 <td style={{ width: '7%' }}>
@@ -331,7 +331,7 @@ function CustomorDataPage({ title, get_status, put_status }) {
                                         type="text"
                                         value={customor.created_at ? customor.created_at.split('.')[0] : ''}
                                         onChange={(e) => handleInputChange(index, 'created_at', e.target.value)}
-                                        disabled={!editState[customor.id]}
+                                        disabled={true}
                                     />
                                 </td>
                                 <td style={{ width: '3%' }}>
