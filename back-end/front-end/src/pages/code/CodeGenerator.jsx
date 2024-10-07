@@ -8,12 +8,12 @@ const CodeGenerator = () => {
   const [formData, setFormData] = useState({
     ad_title: "",
     ad_number: "",
-    hospital_name: "",
-    event_name: "",
-    advertising_company: "",
+    hospital_name_id: "",
+    event_name_id: "",
+    advertising_company_id: "",
     url_code: "",
   });
-
+  const [updatedFields, setUpdatedFields] = useState({}); // 수정된 필드를 추적하는 상태
   const [isFormValid, setIsFormValid] = useState(false);
   const [editingCodeId, setEditingCodeId] = useState(null);
   const [hospitals, setHospitals] = useState([]); // 병원 목록 상태
@@ -61,14 +61,6 @@ const CodeGenerator = () => {
     fetchData();
   }, []);
 
-  // Validate form
-  useEffect(() => {
-    const isValid = Object.values(formData).every(
-      (value) => value.trim() !== ""
-    );
-    setIsFormValid(isValid);
-  }, [formData]);
-
   // 코드 데이터 가져오기
   const fetchUsers = async () => {
     try {
@@ -92,6 +84,7 @@ const CodeGenerator = () => {
   // Input change handler
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    console.log(formData);
   };
 
   const handleDropdownChange = (name, value) => {
@@ -105,22 +98,27 @@ const CodeGenerator = () => {
         ? prevSelectedRows.filter((rowId) => rowId !== id)
         : [...prevSelectedRows, id]
     );
+    console.log(selectedRows);
   };
 
-  // Data submit handler
+  // 코드 생성
   const handleSubmit = async () => {
     const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     let result = "";
+
     for (let i = 0; i < 6; i++) {
       result += characters.charAt(
         Math.floor(Math.random() * characters.length)
       );
     }
+
     const dataToSubmit = { ...formData, url_code: result };
 
     try {
-      const response = await axios.post("/api/urlcode", dataToSubmit);
+      await axios.post("/api/urlcode/new", dataToSubmit);
       alert("코드 생성했습니다");
+      setSelectedRows([]); // 생성 후 선택된 항목 초기화
+      fetchUsers(); // 생성 후 다시 데이터 가져오기
     } catch (error) {
       console.error("Error posting data:", error);
       if (error.response && error.response.status === 400) {
@@ -136,31 +134,66 @@ const CodeGenerator = () => {
     setEditingCodeId(id);
   };
 
+  // 개별 유저 필드 수정 핸들러
+  const handleCodeChange = (id, field, value) => {
+    setCodes((prevCodes) =>
+      prevCodes.map((code) =>
+        code.id === id ? { ...code, [field]: value } : code
+      )
+    );
+  };
+
   // 유저 수정 저장 핸들러
-  const handleSave = async (user) => {
+  const handleEditSave = async (editingCodeId) => {
+    const codeToUpdate = codes.find((code) => code.id === editingCodeId);
+
+    const updatedFields = {
+      ad_title: codeToUpdate.ad_title,
+      ad_number: codeToUpdate.ad_number,
+      event_name_id: codeToUpdate.event_name_id,
+      hospital_name_id: codeToUpdate.hospital_name_id,
+      advertising_company_id: codeToUpdate.advertising_company_id,
+    };
+
+    console.log("???", codeToUpdate);
     try {
-      await axios.put(`/api/user/update`, user);
-      setEditingCodeId(null); // 수정 모드 종료
+      // 업데이트할 필드만 포함한 객체 전송
+      await axios.put(`/api/urlcode/update/${editingCodeId}`, updatedFields);
+      alert("코드 수정 완료");
+      setEditingCodeId(null);
+      fetchUsers(); // 업데이트 후 코드 리스트 다시 가져오기
     } catch (error) {
       console.error("유저 정보 수정 중 오류가 발생했습니다:", error);
       alert("유저 정보 수정에 실패했습니다.");
     }
   };
 
-  // 개별 유저 필드 수정 핸들러
-  const handleCodeChange = (id, field, value) => {
-    setCodes((prevUsers) =>
-      prevUsers.map((user) =>
-        user.user_id === id ? { ...user, [field]: value } : user
-      )
-    );
-  };
-  // ----------------------------------- 페이지 네이션
+  // 페이지 네이션
   const handlePageChange = (page) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page); // 페이지 변경
     }
   };
+  // 체크박스 선택 삭제
+  const handleDelete = async () => {
+    if (selectedRows.length === 0) {
+      alert("삭제할 항목을 선택해 주세요.");
+      return;
+    }
+
+    try {
+      await Promise.all(
+        selectedRows.map((id) => axios.delete(`/api/urlcode/delete/${id}`))
+      );
+      alert("선택한 항목을 삭제했습니다.");
+      setSelectedRows([]); // 삭제 후 선택된 항목 초기화
+      fetchUsers(); // 삭제 후 다시 데이터 가져오기
+    } catch (error) {
+      console.error("삭제 오류:", error);
+      alert("삭제하는 중 오류가 발생했습니다.");
+    }
+  };
+
   return (
     <div className="code-generator container">
       <TitleBox mainmenu="코드 생성" />
@@ -173,7 +206,6 @@ const CodeGenerator = () => {
             value={formData.ad_title}
             onChange={handleChange}
             placeholder="광고 제목"
-            required
           />
         </div>
         <div className="input-group">
@@ -184,7 +216,6 @@ const CodeGenerator = () => {
             value={formData.ad_number}
             onChange={handleChange}
             placeholder="광고 번호"
-            required
           />
         </div>
         <div className="input-group">
@@ -192,8 +223,10 @@ const CodeGenerator = () => {
           <div style={{ width: "217px", height: "40px" }}>
             <CustomDropdown
               options={hospitals} // 병원 목록 전달
-              selectedValue={formData.hospital_name}
-              onChange={(value) => handleDropdownChange("hospital_name", value)} // 선택된 값 업데이트
+              selectedValue={formData.hospital_name_id}
+              onChange={(value) =>
+                handleDropdownChange("hospital_name_id", value)
+              } // 선택된 값 업데이트
               bigDrop={1}
               search={1}
             />{" "}
@@ -204,8 +237,8 @@ const CodeGenerator = () => {
           <div style={{ width: "217px", height: "40px" }}>
             <CustomDropdown
               options={events} // 이벤트 목록 전달
-              selectedValue={formData.event_name}
-              onChange={(value) => handleDropdownChange("event_name", value)} // 선택된 값 업데이트
+              selectedValue={formData.event_name_id}
+              onChange={(value) => handleDropdownChange("event_name_id", value)} // 선택된 값 업데이트
               bigDrop={1}
               search={1}
             />{" "}
@@ -216,23 +249,23 @@ const CodeGenerator = () => {
           <div style={{ width: "217px", height: "40px" }}>
             <CustomDropdown
               options={companies} // 매체 목록 전달
-              selectedValue={formData.advertising_company}
+              selectedValue={formData.advertising_company_id}
               onChange={(value) =>
-                handleDropdownChange("advertising_company", value)
+                handleDropdownChange("advertising_company_id", value)
               } // 선택된 값 업데이트
               bigDrop={1}
               search={1}
             />
           </div>
         </div>
-        <button type="button" onClick={handleSubmit} disabled={!isFormValid}>
+        <button type="button" onClick={handleSubmit}>
           코드 생성하기
         </button>
       </div>
 
       {/* 코드 테이블 */}
       <h2>코드 리스트</h2>
-      <button>삭제</button>
+      <button onClick={handleDelete}>삭제</button>
       <table className="code-table">
         <thead>
           <tr>
@@ -265,25 +298,33 @@ const CodeGenerator = () => {
                   <input
                     type="text"
                     value={code.ad_number}
-                    disabled={editingCodeId !== code.user_id} // 수정 모드일 때만 활성화
+                    disabled={editingCodeId !== code.id} // 수정 모드일 때만 활성화
                     onChange={(e) =>
-                      handleCodeChange(
-                        code.user_id,
-                        "ad_number",
-                        e.target.value
-                      )
+                      handleCodeChange(code.id, "ad_number", e.target.value)
                     }
                   />
                 </td>
+
                 <td>
-                  <input
-                    type="text"
-                    value={code.hospital_name}
-                    disabled={editingCodeId !== code.id} // 수정 모드일 때만 활성화
-                    onChange={(e) =>
-                      handleCodeChange(code.id, "hospital_name", e.target.value)
-                    }
-                  />
+                  {editingCodeId === code.id ? (
+                    <CustomDropdown
+                      options={hospitals} // 병원 목록 전달
+                      selectedValue={code.hospital_name_id}
+                      onChange={
+                        (value) =>
+                          handleCodeChange(code.id, "hospital_name_id", value) // 선택된 값 업데이트
+                      }
+                      bigDrop={1}
+                      search={1}
+                    />
+                  ) : (
+                    <input
+                      type="text"
+                      value={code.hospital_name}
+                      disabled // 수정 모드가 아닐 때는 비활성화
+                      readOnly // 비활성화 상태에서 읽기 전용
+                    />
+                  )}
                 </td>
                 <td>
                   <input
@@ -296,32 +337,57 @@ const CodeGenerator = () => {
                   />
                 </td>
                 <td>
-                  <input
-                    type="text"
-                    value={code.advertising_company}
-                    disabled={editingCodeId !== code.id} // 수정 모드일 때만 활성화
-                    onChange={(e) =>
-                      handleCodeChange(
-                        code.id,
-                        "advertising_company",
-                        e.target.value
-                      )
-                    }
-                  />
-                </td>
-                <td>
-                  <input
-                    type="text"
-                    value={code.event_name}
-                    disabled={editingCodeId !== code.id} // 수정 모드일 때만 활성화
-                    onChange={(e) =>
-                      handleCodeChange(code.id, "event_name", e.target.value)
-                    }
-                  />
+                  {editingCodeId === code.id ? (
+                    <CustomDropdown
+                      options={companies} // 매체 목록 전달
+                      selectedValue={code.advertising_company_id}
+                      onChange={
+                        (value) =>
+                          handleCodeChange(
+                            code.id,
+                            "advertising_company_id",
+                            value
+                          ) // 선택된 값 업데이트
+                      }
+                      bigDrop={1}
+                      search={1}
+                    />
+                  ) : (
+                    <input
+                      type="text"
+                      value={code.advertising_company_name}
+                      disabled // 수정 모드가 아닐 때는 비활성화
+                      readOnly // 비활성화 상태에서 읽기 전용
+                    />
+                  )}
                 </td>
                 <td>
                   {editingCodeId === code.id ? (
-                    <button onClick={() => handleSave(code)}>저장</button>
+                    <CustomDropdown
+                      options={events} // 이벤트 목록 전달
+                      selectedValue={code.event_name_id}
+                      onChange={
+                        (value) =>
+                          handleCodeChange(code.id, "event_name_id", value) // 선택된 값 업데이트
+                      }
+                      bigDrop={1}
+                      search={1}
+                    />
+                  ) : (
+                    <input
+                      type="text"
+                      value={code.event_name}
+                      disabled // 수정 모드가 아닐 때는 비활성화
+                      readOnly // 비활성화 상태에서 읽기 전용
+                    />
+                  )}
+                </td>
+
+                <td>
+                  {editingCodeId === code.id ? (
+                    <button onClick={() => handleEditSave(code.id)}>
+                      저장
+                    </button>
                   ) : (
                     <button onClick={() => handleEdit(code.id)}>수정</button>
                   )}

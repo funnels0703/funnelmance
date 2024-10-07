@@ -25,6 +25,9 @@ const getCodes = async (pageInt, limitInt) => {
       hospital_name_id: true,
       advertising_company_id: true,
     },
+    orderBy: {
+      created_at: "desc", // ID를 기준으로 내림차순 정렬
+    },
   });
 
   // 병원 이름, 광고 회사 이름, 이벤트 이름을 가져오고 codes에 추가
@@ -72,10 +75,46 @@ async function checkCodeUniqueness(url_code) {
   return !existingCode; // 고유하다면 true 반환
 }
 
-async function createUrlCode(data) {
+async function createUrlCode(newUrlCode) {
   return await prisma.url_code_setting.create({
-    data,
+    data: newUrlCode,
   });
+}
+
+async function updateUrlCode(id, updatedFields) {
+  try {
+    const updatedUrlCode = await prisma.url_code_setting.update({
+      where: { id },
+      data: { ...updatedFields }, // 새 URL 코드로 업데이트
+    });
+    return updatedUrlCode;
+  } catch (error) {
+    console.error("업데이트 실패:", error);
+    return null; // 실패 시 null 반환
+  }
+}
+
+async function deleteUrlCode(deleteId) {
+  try {
+    const deletedCode = await prisma.url_code_setting.delete({
+      where: {
+        id: deleteId, // deleteId로 해당 ID의 코드를 삭제
+      },
+    });
+
+    return {
+      success: true,
+      message: "코드가 삭제되었습니다.",
+      deletedCode, // 삭제된 코드 정보 반환
+    };
+  } catch (error) {
+    console.error("삭제 오류:", error);
+    return {
+      success: false,
+      message: "코드 삭제에 실패했습니다.",
+      error: error.message, // 오류 메시지 반환
+    };
+  }
 }
 
 // 접속 처리
@@ -143,6 +182,8 @@ module.exports = {
   getCodes,
   checkCodeUniqueness,
   createUrlCode,
+  updateUrlCode,
+  deleteUrlCode,
   // 접속 처리
   findCodeByUrlCode,
   // findClickByIpAndCode,
