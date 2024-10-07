@@ -23,6 +23,8 @@ function CustomorDataPage({ title, get_status, put_status }) {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1); // 현재 페이지
   const [totalPages, setTotalPages] = useState(1); // 전체 페이지 수
+  const [totalCounts, setTotalCounts] = useState([]); // 전체 페이지 수
+
   const limit = 10; // 한 페이지에 보여줄 데이터 수
   const [recentSettings, setRecentSettings] = useState([]);
   const [checkedCompanies, setCheckedCompanies] = useState([]); // 체크된 회사 목록
@@ -97,14 +99,15 @@ function CustomorDataPage({ title, get_status, put_status }) {
         ...filters,
       });
 
-      if (response.data.total > 0) {
+      if (response.data.total.totalCount > 0) {
         setCustomors(
           response.data.data.map((customor) => ({
             ...customor,
             isSelected: false,
           }))
         );
-        setTotalPages(Math.ceil(response.data.total / limit));
+        setTotalPages(Math.ceil(response.data.total.totalCount / limit));
+        setTotalCounts(response.data.total);
         const initialState = {};
         response.data.data.forEach((item) => {
           initialState[item.id] = false;
@@ -219,8 +222,8 @@ function CustomorDataPage({ title, get_status, put_status }) {
 
   //   console.log("checkedCompanies", checkedCompanies);
   //   console.log("companyOptions", companyOptions);
-  console.log("customDateRange", customDateRange);
-  console.log("selectedHospital", selectedHospital);
+  //   console.log("customDateRange", customDateRange);
+  //   console.log("selectedHospital", selectedHospital);
 
   return (
     <div className="DataContainer container">
@@ -249,8 +252,16 @@ function CustomorDataPage({ title, get_status, put_status }) {
       {/* 최근 설정 카드 */}
       <div className="itdependson" onClick={closeCompanyDropdown}>
         <div className="userSetCompany cardMarginAdded">
-          <StatCard label="DB 전체" value="139" />
+          <StatCard
+            label="DB 전체"
+            value={
+              totalCounts && totalCounts.totalCount !== undefined
+                ? totalCounts.totalCount
+                : 0
+            }
+          />
         </div>
+        {/* 매체별 갯수 및 리스트 */}
         <div className="userSetCompany cardAllSet">
           {(typeof checkedCompanies === "string"
             ? checkedCompanies.split(",").map((id) => parseInt(id)) // 문자열을 배열로 변환
@@ -263,10 +274,25 @@ function CustomorDataPage({ title, get_status, put_status }) {
               const company = companyOptions.find(
                 (company) => company.id === companyId
               );
+
               if (company) {
-                // 일치하는 회사가 있으면 StatCard에 표시
+                // totalCounts가 정의되어 있는지 확인
+                const countData =
+                  totalCounts && totalCounts.countsByCompany
+                    ? totalCounts.countsByCompany.find(
+                        (count) => count.advertising_company_id === company.id
+                      )
+                    : null;
+
+                // countData가 있는 경우, value를 count로 설정하고 없으면 "0"으로 설정
+                const value = countData ? countData.count : 0;
+
                 return (
-                  <StatCard key={company.id} label={company.name} value="2" />
+                  <StatCard
+                    key={company.id}
+                    label={company.name}
+                    value={value}
+                  />
                 );
               }
               return null; // 일치하는 회사가 없으면 아무것도 반환하지 않음

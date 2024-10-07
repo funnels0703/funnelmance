@@ -110,28 +110,29 @@ const getTotalCustomorCount = async (filters) => {
     startDate,
     endDate,
     url_code,
-    selected_hospital_id, // 병원 ID 필터 추가
+    selected_hospital_id,
   } = filters;
+
   const companyIds = advertising_company_ids
     ? advertising_company_ids.split(",").map(Number)
     : [];
 
   try {
+    // URL 코드 설정 ID를 가져옴
     const urlCodeSettingIds = await getUrlCodeSettingIds(
       companyIds,
       selected_hospital_id
     );
 
-    // 로그 추가
     console.log("Company IDs:", companyIds);
     console.log("Selected Hospital ID:", selected_hospital_id);
     console.log("URL Code Setting IDs:", urlCodeSettingIds);
 
-    const count = await prisma.customor_db.count({
+    // 총 개수 카운트
+    const totalCount = await prisma.customor_db.count({
       where: {
         data_status: 0,
         date: {
-          // 주석 처리된 날짜 필터
           gte: new Date(startDate),
           lte: new Date(endDate),
         },
@@ -142,10 +143,61 @@ const getTotalCustomorCount = async (filters) => {
       },
     });
 
-    // 로그 출력
-    console.log("Total Count:", count);
+    // 각 광고 회사별 카운트
+    const companyCounts = await prisma.customor_db.groupBy({
+      by: ["url_code_setting_id"], // URL 코드 설정 ID로 그룹화
+      where: {
+        data_status: 0,
+        date: {
+          gte: new Date(startDate),
+          lte: new Date(endDate),
+        },
+        url_code_setting_id: {
+          in: urlCodeSettingIds,
+        },
+        ...(url_code ? { url_code } : {}),
+      },
+      _count: {
+        url_code_setting_id: true,
+      },
+    });
 
-    return count;
+    // 결과를 회사 ID로 매핑하고 중복 제거 및 카운트 합산
+    const countsByCompany = {};
+
+    await Promise.all(
+      companyCounts.map(async (company) => {
+        const setting = await prisma.url_code_setting.findUnique({
+          where: { id: company.url_code_setting_id },
+          select: { advertising_company_id: true },
+        });
+
+        const advertising_company_id = setting.advertising_company_id;
+
+        // countsByCompany에 카운트 누적
+        if (!countsByCompany[advertising_company_id]) {
+          countsByCompany[advertising_company_id] = 0; // 초기화
+        }
+        countsByCompany[advertising_company_id] +=
+          company._count.url_code_setting_id; // 카운트 추가
+      })
+    );
+
+    // 최종 결과 배열로 변환
+    const countsArray = Object.entries(countsByCompany).map(
+      ([advertising_company_id, count]) => ({
+        advertising_company_id: Number(advertising_company_id),
+        count,
+      })
+    );
+
+    console.log("Total Count:", totalCount);
+    console.log("Counts by Company:", countsArray);
+
+    return {
+      totalCount,
+      countsByCompany: countsArray,
+    };
   } catch (error) {
     console.error("Error fetching total customor count:", error);
     throw error;
