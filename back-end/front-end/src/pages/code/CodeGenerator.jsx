@@ -69,13 +69,13 @@ const CodeGenerator = () => {
     setIsFormValid(isValid);
   }, [formData]);
 
-  // 유저 데이터 가져오기
+  // 코드 데이터 가져오기
   const fetchUsers = async () => {
     try {
       const response = await axios.get(
         `/api/urlCode/list?page=${currentPage}&limit=${itemsPerPage}`
       );
-      setCodes(response.data.codes);
+      setCodes(response.data.codesWithDetails);
       setTotalPages(response.data.totalPages); // 서버에서 받은 전체 페이지 수
       setCurrentPage(response.data.currentPage); // 서버에서 받은 현재 페이지
     } catch (error) {

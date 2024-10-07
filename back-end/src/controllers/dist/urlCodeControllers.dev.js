@@ -11,7 +11,7 @@ var _require = require("../models/urlCodeModel"),
     createUrlCode = _require.createUrlCode;
 
 var getCodesController = function getCodesController(req, res) {
-  var _req$query, _req$query$page, page, _req$query$limit, limit, pageInt, limitInt, _ref, codes, totalPages;
+  var _req$query, _req$query$page, page, _req$query$limit, limit, pageInt, limitInt, _ref, codesWithDetails, totalPages;
 
   return regeneratorRuntime.async(function getCodesController$(_context) {
     while (1) {
@@ -28,10 +28,10 @@ var getCodesController = function getCodesController(req, res) {
 
         case 7:
           _ref = _context.sent;
-          codes = _ref.codes;
+          codesWithDetails = _ref.codesWithDetails;
           totalPages = _ref.totalPages;
           res.status(200).json({
-            codes: codes,
+            codesWithDetails: codesWithDetails,
             // 가져온 코드 데이터 반환
             totalPages: totalPages,
             // 전체 페이지 수

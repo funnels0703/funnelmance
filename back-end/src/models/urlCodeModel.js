@@ -2,9 +2,8 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-// URL 코드 데이터를 페이지네이션과 함께 가져오는 컨트롤러 함수
+// URL 코드 데이터 조회
 const getCodes = async (pageInt, limitInt) => {
-  console.log(222);
   const totalItems = await prisma.url_code_setting.count(); // 전체 레코드 수 계산
   const totalPages = Math.ceil(totalItems / limitInt); // 전체 페이지 수 계산
 
@@ -25,14 +24,43 @@ const getCodes = async (pageInt, limitInt) => {
       event_name_id: true,
       hospital_name_id: true,
       advertising_company_id: true,
-      ad_spending: true,
-      advertising_company: true, // 관계 데이터도 필요하면 추가
-      event_name: true, // 관계 데이터도 필요하면 추가
-      hospital_name: true, // 관계 데이터도 필요하면 추가
     },
   });
 
-  return { codes, totalPages };
+  // 병원 이름, 광고 회사 이름, 이벤트 이름을 가져오고 codes에 추가
+  const codesWithDetails = await Promise.all(
+    codes.map(async (code) => {
+      const [hospital, advertisingCompany, eventName] = await Promise.all([
+        code.hospital_name_id
+          ? prisma.hospital_name.findUnique({
+              where: { id: code.hospital_name_id },
+              select: { name: true },
+            })
+          : null,
+        code.advertising_company_id
+          ? prisma.advertising_company.findUnique({
+              where: { id: code.advertising_company_id },
+              select: { name: true },
+            })
+          : null,
+        code.event_name_id
+          ? prisma.event_name.findUnique({
+              where: { id: code.event_name_id },
+              select: { name: true },
+            })
+          : null,
+      ]);
+
+      return {
+        ...code,
+        hospital_name: hospital?.name || null,
+        advertising_company_name: advertisingCompany?.name || null,
+        event_name: eventName?.name || null,
+      };
+    })
+  );
+
+  return { codesWithDetails, totalPages };
 };
 
 async function checkCodeUniqueness(url_code) {

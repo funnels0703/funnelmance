@@ -17,10 +17,10 @@ const getCodesController = async (req, res) => {
   try {
     console.log(111);
     // 모델에서 URL 코드 설정 데이터를 가져옴
-    const { codes, totalPages } = await getCodes(pageInt, limitInt);
+    const { codesWithDetails, totalPages } = await getCodes(pageInt, limitInt);
 
     res.status(200).json({
-      codes, // 가져온 코드 데이터 반환
+      codesWithDetails, // 가져온 코드 데이터 반환
       totalPages, // 전체 페이지 수
       currentPage: pageInt, // 현재 페이지
     });
